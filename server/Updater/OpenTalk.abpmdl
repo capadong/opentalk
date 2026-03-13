@@ -1,0 +1,113 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "5.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    },
+    "Volo.Abp.Account": {
+      "version": "10.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "10.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    },
+    "Volo.Abp.Identity": {
+      "version": "10.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "10.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "10.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "10.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "10.1.0",
+      "isInstalled": true,
+      "creationTime": "03/13/2026 12:35:18 +00:00"
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "OpenTalk.Application": {
+      "path": "src/OpenTalk.Application/OpenTalk.Application.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.Application.Tests": {
+      "path": "test/OpenTalk.Application.Tests/OpenTalk.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "OpenTalk.Domain.Shared": {
+      "path": "src/OpenTalk.Domain.Shared/OpenTalk.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.Application.Contracts": {
+      "path": "src/OpenTalk.Application.Contracts/OpenTalk.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.HttpApi": {
+      "path": "src/OpenTalk.HttpApi/OpenTalk.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.HttpApi.Client": {
+      "path": "src/OpenTalk.HttpApi.Client/OpenTalk.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.Web": {
+      "path": "src/OpenTalk.Web/OpenTalk.Web.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.Web.Tests": {
+      "path": "test/OpenTalk.Web.Tests/OpenTalk.Web.Tests.abppkg",
+      "folder": "test"
+    },
+    "OpenTalk.EntityFrameworkCore.Tests": {
+      "path": "test/OpenTalk.EntityFrameworkCore.Tests/OpenTalk.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "OpenTalk.EntityFrameworkCore": {
+      "path": "src/OpenTalk.EntityFrameworkCore/OpenTalk.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.TestBase": {
+      "path": "test/OpenTalk.TestBase/OpenTalk.TestBase.abppkg",
+      "folder": "test"
+    },
+    "OpenTalk.Domain.Tests": {
+      "path": "test/OpenTalk.Domain.Tests/OpenTalk.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "OpenTalk.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/OpenTalk.HttpApi.Client.ConsoleTestApp/OpenTalk.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "OpenTalk.DbMigrator": {
+      "path": "src/OpenTalk.DbMigrator/OpenTalk.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "OpenTalk.Domain": {
+      "path": "src/OpenTalk.Domain/OpenTalk.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<Solution>
+    <Configurations>
+        <Platform Name="Any CPU" />
+    </Configurations>
+    <Folder Name="/src/">
+        <Project Path="src/OpenTalk.Domain/OpenTalk.Domain.csproj" />
+        <Project Path="src/OpenTalk.Application/OpenTalk.Application.csproj" />
+        <Project Path="src/OpenTalk.EntityFrameworkCore/OpenTalk.EntityFrameworkCore.csproj" />
+        <Project Path="src/OpenTalk.Web/OpenTalk.Web.csproj" />
+        <Project Path="src/OpenTalk.Domain.Shared/OpenTalk.Domain.Shared.csproj" />
+        <Project Path="src/OpenTalk.Application.Contracts/OpenTalk.Application.Contracts.csproj" />
+        <Project Path="src/OpenTalk.HttpApi/OpenTalk.HttpApi.csproj" />
+        <Project Path="src/OpenTalk.HttpApi.Client/OpenTalk.HttpApi.Client.csproj" />
+        <Project Path="src/OpenTalk.DbMigrator/OpenTalk.DbMigrator.csproj" />
+    </Folder>
+    <Folder Name="/test/">
+        <Project Path="test/OpenTalk.Application.Tests/OpenTalk.Application.Tests.csproj" />
+        <Project Path="test/OpenTalk.Web.Tests/OpenTalk.Web.Tests.csproj" />
+        <Project Path="test/OpenTalk.EntityFrameworkCore.Tests/OpenTalk.EntityFrameworkCore.Tests.csproj" />
+        <Project Path="test/OpenTalk.TestBase/OpenTalk.TestBase.csproj" />
+        <Project Path="test/OpenTalk.Domain.Tests/OpenTalk.Domain.Tests.csproj" />
+        <Project Path="test/OpenTalk.HttpApi.Client.ConsoleTestApp/OpenTalk.HttpApi.Client.ConsoleTestApp.csproj" />
+    </Folder>
+</Solution>
