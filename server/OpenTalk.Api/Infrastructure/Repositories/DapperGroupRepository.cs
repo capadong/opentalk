@@ -23,4 +23,49 @@ public class DapperGroupRepository(IDbConnectionFactory db) : IGroupRepository
         var count = await conn.ExecuteScalarAsync<long>(sql, new { GroupId = groupId, UserId = userId });
         return count > 0;
     }
+
+    public async Task<long> CreateAsync(ChatGroup group)
+    {
+        const string sql = @"INSERT INTO chat_groups (name, owner_id, created_at)
+                             VALUES (@Name, @OwnerId, @CreatedAt);
+                             SELECT LAST_INSERT_ID();";
+        using var conn = db.Create();
+        var id = await conn.ExecuteScalarAsync<long>(sql, group);
+        group.Id = id;
+        return id;
+    }
+
+    public async Task<int> DeleteAsync(long groupId)
+    {
+        using var conn = db.Create();
+        using var tx = conn.BeginTransaction();
+        var a = await conn.ExecuteAsync("DELETE FROM group_members WHERE group_id=@GroupId", new { GroupId = groupId }, tx);
+        var b = await conn.ExecuteAsync("DELETE FROM messages WHERE group_id=@GroupId", new { GroupId = groupId }, tx);
+        var c = await conn.ExecuteAsync("DELETE FROM chat_groups WHERE id=@GroupId", new { GroupId = groupId }, tx);
+        tx.Commit();
+        return a + b + c;
+    }
+
+    public async Task<IEnumerable<GroupMember>> ListMembersAsync(long groupId)
+    {
+        const string sql = @"SELECT id, group_id AS GroupId, user_id AS UserId, joined_at AS JoinedAt
+                             FROM group_members WHERE group_id = @GroupId ORDER BY id DESC";
+        using var conn = db.Create();
+        return await conn.QueryAsync<GroupMember>(sql, new { GroupId = groupId });
+    }
+
+    public async Task<int> AddMemberAsync(long groupId, long userId, DateTime joinedAt)
+    {
+        const string sql = @"INSERT IGNORE INTO group_members (group_id, user_id, joined_at)
+                             VALUES (@GroupId, @UserId, @JoinedAt)";
+        using var conn = db.Create();
+        return await conn.ExecuteAsync(sql, new { GroupId = groupId, UserId = userId, JoinedAt = joinedAt });
+    }
+
+    public async Task<int> RemoveMemberAsync(long groupId, long userId)
+    {
+        const string sql = @"DELETE FROM group_members WHERE group_id=@GroupId AND user_id=@UserId";
+        using var conn = db.Create();
+        return await conn.ExecuteAsync(sql, new { GroupId = groupId, UserId = userId });
+    }
 }
