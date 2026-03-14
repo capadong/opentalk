@@ -1,13 +1,36 @@
 <template>
   <el-container style="height:100vh">
-    <el-aside width="260px" style="border-right:1px solid var(--el-border-color);display:flex;flex-direction:column">
+    <el-aside width="280px" style="border-right:1px solid var(--el-border-color);display:flex;flex-direction:column">
       <div style="padding:12px;border-bottom:1px solid var(--el-border-color)">
         <el-input v-model="keyword" placeholder="搜索群组" clearable></el-input>
       </div>
-      <el-scrollbar>
+      <el-scrollbar style="flex:1">
         <el-menu :default-active="String(currentGroup?.id||'')" @select="onSelect">
-          <el-menu-item v-for="g in filteredGroups" :key="g.id" :index="String(g.id)">
-            <el-icon class="me-2"><chat-dot-round /></el-icon>{{ g.name }}
+          <el-menu-item
+            v-for="g in filteredGroups"
+            :key="g.id"
+            :index="String(g.id)"
+            :style="{height:'auto',padding:'6px 12px',alignItems:'stretch'}"
+          >
+            <div style="display:flex;flex-direction:column;width:100%;gap:4px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;align-items:center;gap:6px;overflow:hidden">
+                  <el-icon><chat-dot-round /></el-icon>
+                  <span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    {{ g.name }}
+                  </span>
+                </div>
+                <span style="font-size:12px;opacity:.6">
+                  {{ formatTime(g.lastCreatedAt) }}
+                </span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;opacity:.8">
+                <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                  {{ g.lastContent || '暂无消息' }}
+                </span>
+                <el-badge v-if="groupUnread[g.id]" :value="groupUnread[g.id]" type="danger" />
+              </div>
+            </div>
           </el-menu-item>
         </el-menu>
       </el-scrollbar>
@@ -30,9 +53,9 @@
         </div>
       </el-header>
       <el-container>
-        <el-main style="padding:0;display:flex">
+        <el-main style="padding:0;display:flex;height:calc(100vh - 56px)">
           <div style="flex:1;display:flex;flex-direction:column">
-            <el-scrollbar ref="msgScroll" style="flex:1;padding:12px">
+            <el-scrollbar ref="msgScroll" style="flex:1;padding:12px 16px 12px 16px">
               <div
                 v-for="m in messages"
                 :key="m.id"
@@ -72,7 +95,7 @@
                 </div>
               </div>
             </el-scrollbar>
-            <div style="border-top:1px solid var(--el-border-color);padding:8px;display:flex;flex-direction:column;gap:8px">
+            <div style="height:150px;border-top:1px solid var(--el-border-color);padding:8px;display:flex;flex-direction:column;gap:8px">
               <div v-if="pendingImageUrl" style="padding-bottom:4px">
                 <el-image :src="pendingImageUrl" style="max-width:160px;max-height:160px" fit="contain" />
               </div>
@@ -121,7 +144,7 @@ import { useRouter } from 'vue-router'
 import { ChatDotRound, ChatLineRound } from '@element-plus/icons-vue'
 import { API_BASE, getGroups, getMessages, getGroupMembers, getDirectMessages, uploadFile as apiUpload } from '../api/http'
 
-type Group = { id: number; name: string }
+type Group = { id: number; name: string; lastContent?:string; lastCreatedAt?:string }
 type Message = { id:number; groupId?:number; senderId:number; receiverId?:number; type:number; content:string; fileUrl?:string; createdAt?:string }
 type Member = { userId:number; username:string; nickname?:string; avatar?:string; joinedAt:string }
 
@@ -139,6 +162,7 @@ const text = ref('')
 const keyword = ref('')
 const msgScroll = ref()
 const unread = ref<Record<number, number>>({})
+const groupUnread = ref<Record<number, number>>({})
 const pendingImage = ref<File | null>(null)
 const pendingImageUrl = ref<string | null>(null)
 
@@ -153,9 +177,16 @@ const conn = new HubConnectionBuilder()
   .build()
 
 conn.on('ReceiveMessage', (m: Message) => {
+  if (!m.groupId) return
+  const g = groups.value.find(x => x.id === m.groupId)
+  if (g) {
+    updateGroupSummaryFromMessage(m, g)
+  }
   if (conversationMode.value === 'group' && currentGroup.value && m.groupId === currentGroup.value.id) {
     messages.value.push(m)
     setTimeout(() => msgScroll.value?.scrollTo?.({ top: 999999 }), 0)
+  } else {
+    groupUnread.value[m.groupId] = (groupUnread.value[m.groupId] || 0) + 1
   }
 })
 
@@ -231,7 +262,12 @@ async function onSelect(index: string) {
   currentPeer.value = null
   await conn.invoke('JoinGroup', g.id)
   members.value = await getGroupMembers(g.id)
-  messages.value = (await getMessages(g.id, 50)).reverse()
+  const list = (await getMessages(g.id, 50)).reverse()
+  messages.value = list
+  if (list.length) {
+    updateGroupSummaryFromMessage(list[list.length - 1], g)
+  }
+  groupUnread.value[g.id] = 0
   setTimeout(() => msgScroll.value?.scrollTo?.({ top: 999999 }), 0)
 }
 
@@ -313,6 +349,42 @@ function avatarOf(userIdValue:number) {
   return m?.avatar
 }
 
+function updateGroupSummaryFromMessage(m: Message, g: Group) {
+  g.lastCreatedAt = m.createdAt || new Date().toISOString()
+  if (m.type === 1) {
+    const text = m.content || ''
+    g.lastContent = text.length > 20 ? text.slice(0, 20) + '…' : text
+  } else if (m.type === 2) {
+    g.lastContent = '[图片]'
+  } else if (m.type === 3) {
+    g.lastContent = '[文件]'
+  } else {
+    g.lastContent = m.content || ''
+  }
+}
+
+function formatTime(value?:string) {
+  if (!value) return ''
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return ''
+  const now = new Date()
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startDate = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  const diffDays = Math.floor((startToday.getTime() - startDate.getTime()) / 86400000)
+  const hh = d.getHours().toString().padStart(2, '0')
+  const mm = d.getMinutes().toString().padStart(2, '0')
+  const hm = `${hh}:${mm}`
+  if (diffDays === 0) return hm
+  if (diffDays === 1) return `昨天 ${hm}`
+  if (diffDays === 2) return `前天 ${hm}`
+  const month = d.getMonth() + 1
+  const day = d.getDate()
+  if (d.getFullYear() === now.getFullYear()) {
+    return `${month}-${day} ${hm}`
+  }
+  return `${d.getFullYear()}-${month}-${day} ${hm}`
+}
+
 function logout() {
   localStorage.removeItem('token'); localStorage.removeItem('user')
   router.push('/login')
@@ -324,3 +396,8 @@ export default {
   components: { ChatDotRound, ChatLineRound }
 }
 </script>
+<!-- <style lang="scss">
+:root{
+  --el-menu-item-height: 150px;
+}
+</style> -->
