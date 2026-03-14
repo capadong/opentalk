@@ -4,7 +4,7 @@ using OpenTalk.Infrastructure.Repositories;
 
 namespace OpenTalk.Application.Services;
 
-public class MessageService(IMessageRepository messages, IGroupRepository groups)
+public class MessageService(IMessageRepository messages, IGroupRepository groups, IDirectMessageRepository directMessages)
 {
     public async Task<ChatMessage> SaveMessageAsync(SendMessageDto dto)
     {
@@ -22,4 +22,21 @@ public class MessageService(IMessageRepository messages, IGroupRepository groups
 
     public Task<IEnumerable<ChatMessage>> GetRecentAsync(long groupId, int limit = 50)
         => messages.GetByGroupAsync(groupId, limit);
+
+    public async Task<DirectMessage> SaveDirectMessageAsync(SendDirectMessageDto dto)
+    {
+        var message = new DirectMessage
+        {
+            SenderId = dto.SenderId,
+            ReceiverId = dto.ReceiverId,
+            Type = dto.Type,
+            Content = dto.Content,
+            FileUrl = dto.FileUrl,
+            CreatedAt = dto.CreatedAt
+        };
+        return await directMessages.InsertAsync(message);
+    }
+
+    public Task<IEnumerable<DirectMessage>> GetDirectRecentAsync(long userId, long peerId, int limit = 50)
+        => directMessages.GetRecentAsync(userId, peerId, limit);
 }

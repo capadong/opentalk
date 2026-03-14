@@ -16,7 +16,14 @@
       <el-header height="56px" style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--el-border-color)">
         <div style="display:flex;align-items:center;gap:8px">
           <el-icon><chat-line-round /></el-icon>
-          <span style="font-weight:600">{{ currentGroup?.name || '未选择群组' }}</span>
+          <span style="font-weight:600">
+            <template v-if="conversationMode === 'group'">
+              {{ currentGroup?.name || '未选择群组' }}
+            </template>
+            <template v-else>
+              与 {{ currentPeer?.nickname || currentPeer?.username || ('用户 ' + (currentPeer?.userId || '')) }} 私聊
+            </template>
+          </span>
         </div>
         <div>
           <el-button size="small" @click="logout">退出登录</el-button>
@@ -26,11 +33,19 @@
         <el-main style="padding:0;display:flex">
           <div style="flex:1;display:flex;flex-direction:column">
             <el-scrollbar ref="msgScroll" style="flex:1;padding:12px">
-              <div v-for="m in messages" :key="m.id" style="margin:8px 0">
-                <el-card shadow="never">
+              <div
+                v-for="m in messages"
+                :key="m.id"
+                :style="{
+                  margin:'8px 0',
+                  display:'flex',
+                  justifyContent: m.senderId === userId ? 'flex-end' : 'flex-start'
+                }"
+              >
+                <el-card shadow="never" style="max-width:70%">
                   <template #header>
                     <div style="display:flex;justify-content:space-between">
-                      <span>用户 {{ m.senderId }}</span>
+                      <span>{{ displayName(m.senderId) }}</span>
                       <span style="opacity:.6">{{ new Date(m.createdAt || new Date()).toLocaleString() }}</span>
                     </div>
                   </template>
@@ -52,9 +67,21 @@
               <el-button type="primary" @click="sendText">发送</el-button>
             </div>
           </div>
-          <div style="width:260px;border-left:1px solid var(--el-border-color);padding:12px">
+          <div style="width:260px;border-left:1px solid var(--el-border-color);padding:12px;display:flex;flex-direction:column">
             <div style="font-weight:600;margin-bottom:8px">成员</div>
-            <el-empty description="占位"></el-empty>
+            <el-scrollbar style="flex:1">
+              <template v-if="members.length">
+                <div
+                  v-for="m in members"
+                  :key="m.userId"
+                  style="padding:4px 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer"
+                  @click="openDirect(m)"
+                >
+                  <span>{{ m.nickname || m.username || ('用户 ' + m.userId) }}</span>
+                </div>
+              </template>
+              <el-empty v-else description="暂无成员"></el-empty>
+            </el-scrollbar>
           </div>
         </el-main>
       </el-container>
@@ -68,10 +95,11 @@ import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { ChatDotRound, ChatLineRound } from '@element-plus/icons-vue'
-import { API_BASE, getGroups, getMessages, uploadFile as apiUpload } from '../api/http'
+import { API_BASE, getGroups, getMessages, getGroupMembers, getDirectMessages, uploadFile as apiUpload } from '../api/http'
 
 type Group = { id: number; name: string }
-type Message = { id:number; groupId:number; senderId:number; type:number; content:string; fileUrl?:string; createdAt?:string }
+type Message = { id:number; groupId?:number; senderId:number; receiverId?:number; type:number; content:string; fileUrl?:string; createdAt?:string }
+type Member = { userId:number; username:string; nickname?:string; joinedAt:string }
 
 const router = useRouter()
 const user = JSON.parse(localStorage.getItem('user') || '{"id":1}')
@@ -79,7 +107,10 @@ const userId = user.id || 1
 
 const groups = ref<Group[]>([])
 const messages = ref<Message[]>([])
+const members = ref<Member[]>([])
 const currentGroup = ref<Group | null>(null)
+const currentPeer = ref<Member | null>(null)
+const conversationMode = ref<'group' | 'direct'>('group')
 const text = ref('')
 const keyword = ref('')
 const msgScroll = ref()
@@ -95,15 +126,29 @@ const conn = new HubConnectionBuilder()
   .build()
 
 conn.on('ReceiveMessage', (m: Message) => {
-  if (currentGroup.value && m.groupId === currentGroup.value.id) {
+  if (conversationMode.value === 'group' && currentGroup.value && m.groupId === currentGroup.value.id) {
     messages.value.push(m)
     setTimeout(() => msgScroll.value?.scrollTo?.({ top: 999999 }), 0)
+  }
+})
+
+conn.on('ReceiveDirectMessage', (m: Message) => {
+  if (conversationMode.value === 'direct' && currentPeer.value) {
+    const peerId = currentPeer.value.userId
+    if (
+      (m.senderId === userId && m.receiverId === peerId) ||
+      (m.senderId === peerId && m.receiverId === userId)
+    ) {
+      messages.value.push(m)
+      setTimeout(() => msgScroll.value?.scrollTo?.({ top: 999999 }), 0)
+    }
   }
 })
 
 onMounted(async () => {
   try {
     await conn.start()
+    await conn.invoke('Register', userId)
     groups.value = await getGroups(userId)
     if (groups.value.length) {
       await onSelect(String(groups.value[0].id))
@@ -119,24 +164,60 @@ async function onSelect(index: string) {
   const id = Number(index)
   const g = groups.value.find(x => x.id === id)
   if (!g) return
+  conversationMode.value = 'group'
   currentGroup.value = g
+  currentPeer.value = null
   await conn.invoke('JoinGroup', g.id)
+  members.value = await getGroupMembers(g.id)
   messages.value = (await getMessages(g.id, 50)).reverse()
   setTimeout(() => msgScroll.value?.scrollTo?.({ top: 999999 }), 0)
 }
 
 async function sendText() {
-  if (!currentGroup.value || !text.value.trim()) return
-  const dto = { groupId: currentGroup.value.id, senderId: userId, type: 1, content: text.value.trim() }
-  await conn.invoke('SendMessage', dto)
+  if (!text.value.trim()) return
+  if (conversationMode.value === 'group') {
+    if (!currentGroup.value) return
+    const dto = { groupId: currentGroup.value.id, senderId: userId, type: 1, content: text.value.trim() }
+    await conn.invoke('SendMessage', dto)
+  } else {
+    if (!currentPeer.value) return
+    const dto = { senderId: userId, receiverId: currentPeer.value.userId, type: 1, content: text.value.trim() }
+    await conn.invoke('SendDirectMessage', dto)
+  }
   text.value = ''
 }
 
 async function onSelectFile(file:any) {
-  if (!currentGroup.value) return
+  if (!text.value && !file) return
+  if (conversationMode.value === 'group') {
+    if (!currentGroup.value) return
+    const info = await apiUpload(file.raw)
+    const dto = { groupId: currentGroup.value.id, senderId: userId, type: 2, content: file.name, fileUrl: info.url }
+    await conn.invoke('SendMessage', dto)
+    return
+  }
+  if (!currentPeer.value) return
   const info = await apiUpload(file.raw)
-  const dto = { groupId: currentGroup.value.id, senderId: userId, type: 2, content: file.name, fileUrl: info.url }
-  await conn.invoke('SendMessage', dto)
+  const dto = { senderId: userId, receiverId: currentPeer.value.userId, type: 2, content: file.name, fileUrl: info.url }
+  await conn.invoke('SendDirectMessage', dto)
+}
+
+async function openDirect(m: Member) {
+  if (m.userId === userId) return
+  conversationMode.value = 'direct'
+  currentPeer.value = m
+  currentGroup.value = null
+  messages.value = (await getDirectMessages(userId, m.userId, 50)).reverse()
+  setTimeout(() => msgScroll.value?.scrollTo?.({ top: 999999 }), 0)
+}
+
+function displayName(senderId:number) {
+  if (senderId === userId) {
+    return user.Nickname || user.Username || `用户 ${senderId}`
+  }
+  const m = members.value.find(x => x.userId === senderId)
+  if (m) return m.nickname || m.username || `用户 ${senderId}`
+  return `用户 ${senderId}`
 }
 
 function logout() {

@@ -13,4 +13,11 @@ public class GroupController(GroupService groups) : ControllerBase
         var list = await groups.ListAsync(userId);
         return Ok(list);
     }
+
+    [HttpGet("{groupId:long}/members")]
+    public async Task<IActionResult> Members(long groupId)
+    {
+        var members = await groups.ListMembersAsync(groupId);
+        return Ok(members);
+    }
 }

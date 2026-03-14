@@ -8,6 +8,12 @@ public interface IMessageRepository
     Task<IEnumerable<ChatMessage>> GetByGroupAsync(long groupId, int limit = 50);
 }
 
+public interface IDirectMessageRepository
+{
+    Task<DirectMessage> InsertAsync(DirectMessage message);
+    Task<IEnumerable<DirectMessage>> GetRecentAsync(long userId, long peerId, int limit = 50);
+}
+
 public interface IGroupRepository
 {
     Task<IEnumerable<ChatGroup>> ListAllAsync();
@@ -25,5 +31,6 @@ public interface IUserRepository
     Task<User?> GetByUsernameAsync(string username);
     Task<User> InsertAsync(User user);
     Task<IEnumerable<User>> ListAsync(int limit = 100, int offset = 0);
+    Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<long> ids);
     Task<int> DeleteAsync(long id);
 }

@@ -53,6 +53,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSingleton<IDbConnectionFactory>(_ =>
     new MySqlConnectionFactory(builder.Configuration.GetConnectionString("Default") ?? ""));
 builder.Services.AddScoped<IMessageRepository, DapperMessageRepository>();
+builder.Services.AddScoped<IDirectMessageRepository, DapperDirectMessageRepository>();
 builder.Services.AddScoped<IGroupRepository, DapperGroupRepository>();
 builder.Services.AddScoped<IUserRepository, DapperUserRepository>();
 builder.Services.AddScoped<MessageService>();

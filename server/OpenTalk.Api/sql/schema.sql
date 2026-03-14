@@ -41,3 +41,13 @@ CREATE TABLE IF NOT EXISTS files (
   uploader_id BIGINT,
   created_at DATETIME NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS direct_messages (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  sender_id BIGINT NOT NULL,
+  receiver_id BIGINT NOT NULL,
+  type INT NOT NULL,
+  content TEXT NOT NULL,
+  file_url VARCHAR(512),
+  created_at DATETIME NOT NULL
+);

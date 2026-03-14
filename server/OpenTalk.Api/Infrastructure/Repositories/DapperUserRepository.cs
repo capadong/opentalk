@@ -32,6 +32,14 @@ public class DapperUserRepository(IDbConnectionFactory db) : IUserRepository
         return await conn.QueryAsync<User>(sql, new { Limit = limit, Offset = offset });
     }
 
+    public async Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<long> ids)
+    {
+        const string sql = @"SELECT id, username, password_hash AS PasswordHash, nickname, avatar, created_at AS CreatedAt
+                             FROM users WHERE id IN @Ids";
+        using var conn = db.Create();
+        return await conn.QueryAsync<User>(sql, new { Ids = ids });
+    }
+
     public async Task<int> DeleteAsync(long id)
     {
         const string sql = @"DELETE FROM users WHERE id = @Id";

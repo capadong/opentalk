@@ -24,9 +24,17 @@ export function getGroups(userId: number) {
   return http(`/api/v1/groups/${userId}`)
 }
 
+export function getGroupMembers(groupId: number) {
+  return http(`/api/v1/groups/${groupId}/members`)
+}
+
 // Messages
 export function getMessages(groupId: number, limit = 50) {
   return http(`/api/v1/messages/${groupId}?limit=${limit}`)
+}
+
+export function getDirectMessages(userId: number, peerId: number, limit = 50) {
+  return http(`/api/v1/messages/direct/${userId}/${peerId}?limit=${limit}`)
 }
 
 // Files
