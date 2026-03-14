@@ -1,36 +1,5 @@
 @page
 @model OpenTalk.Pages.Admin.IndexModel
 @{
-    ViewData["Title"] = "后台首页";
+    Response.Redirect("/Admin/Dashboard");
 }
-<div class="py-4">
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">用户管理</h5>
-          <p class="card-text">创建、查看、删除用户。</p>
-          <a href="/Admin/Users" class="btn btn-primary">进入</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">群组管理</h5>
-          <p class="card-text">创建群组、管理成员。</p>
-          <a href="/Admin/Groups" class="btn btn-primary">进入</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">API 文档</h5>
-          <p class="card-text">查看 HTTP/SignalR API。</p>
-          <a href="/swagger" class="btn btn-secondary">打开 Swagger</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>

@@ -69,6 +69,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapRazorPages();
+app.MapGet("/", () => Results.Redirect("/Admin/Dashboard"));
+app.MapGet("/Admin", () => Results.Redirect("/Admin/Dashboard"));
 app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();
