@@ -5,13 +5,13 @@ namespace OpenTalk.Infrastructure.Repositories;
 public interface IMessageRepository
 {
     Task<ChatMessage> InsertAsync(ChatMessage message);
-    Task<IEnumerable<ChatMessage>> GetByGroupAsync(long groupId, int limit = 50);
+    Task<IEnumerable<ChatMessage>> GetByGroupAsync(long groupId, int limit = 50, long? beforeId = null);
 }
 
 public interface IDirectMessageRepository
 {
     Task<DirectMessage> InsertAsync(DirectMessage message);
-    Task<IEnumerable<DirectMessage>> GetRecentAsync(long userId, long peerId, int limit = 50);
+    Task<IEnumerable<DirectMessage>> GetRecentAsync(long userId, long peerId, int limit = 50, long? beforeId = null);
 }
 
 public interface IGroupRepository

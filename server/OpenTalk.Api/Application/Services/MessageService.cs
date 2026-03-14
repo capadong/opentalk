@@ -20,8 +20,8 @@ public class MessageService(IMessageRepository messages, IGroupRepository groups
         return await messages.InsertAsync(message);
     }
 
-    public Task<IEnumerable<ChatMessage>> GetRecentAsync(long groupId, int limit = 50)
-        => messages.GetByGroupAsync(groupId, limit);
+    public Task<IEnumerable<ChatMessage>> GetRecentAsync(long groupId, int limit = 50, long? beforeId = null)
+        => messages.GetByGroupAsync(groupId, limit, beforeId);
 
     public async Task<DirectMessage> SaveDirectMessageAsync(SendDirectMessageDto dto)
     {
@@ -37,6 +37,6 @@ public class MessageService(IMessageRepository messages, IGroupRepository groups
         return await directMessages.InsertAsync(message);
     }
 
-    public Task<IEnumerable<DirectMessage>> GetDirectRecentAsync(long userId, long peerId, int limit = 50)
-        => directMessages.GetRecentAsync(userId, peerId, limit);
+    public Task<IEnumerable<DirectMessage>> GetDirectRecentAsync(long userId, long peerId, int limit = 50, long? beforeId = null)
+        => directMessages.GetRecentAsync(userId, peerId, limit, beforeId);
 }

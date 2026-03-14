@@ -1,12 +1,11 @@
 using Dapper;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTalk.Application.Services;
+using OpenTalk.Application.Storage;
 using OpenTalk.Hubs;
 using OpenTalk.Infrastructure;
 using OpenTalk.Infrastructure.Repositories;
@@ -53,10 +52,15 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSingleton<ConnectionTracker>();
 builder.Services.AddSingleton<IDbConnectionFactory>(_ =>
     new MySqlConnectionFactory(builder.Configuration.GetConnectionString("Default") ?? ""));
+
+// Storage provider - swap LocalStorageProvider for OssStorageProvider to use Alibaba OSS
+builder.Services.AddScoped<IStorageProvider, LocalStorageProvider>();
+
 builder.Services.AddScoped<IMessageRepository, DapperMessageRepository>();
 builder.Services.AddScoped<IDirectMessageRepository, DapperDirectMessageRepository>();
 builder.Services.AddScoped<IGroupRepository, DapperGroupRepository>();
 builder.Services.AddScoped<IUserRepository, DapperUserRepository>();
+builder.Services.AddScoped<IFileRepository, DapperFileRepository>();
 builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<UserService>();

@@ -12,4 +12,11 @@
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
+
+	<!-- 批量排除所有.sql文件的编译和语法检查 -->
+	<ItemGroup>
+		<None Include="**\*.sql" />
+		<!-- 若原本有Compile/Content包含.sql的配置，需删除或注释掉 -->
+		<!-- <Compile Include="**\*.sql" /> （删除此行） -->
+	</ItemGroup>
 </Project>

@@ -28,18 +28,21 @@ export function getGroupMembers(groupId: number) {
   return http(`/api/v1/groups/${groupId}/members`)
 }
 
-// Messages
-export function getMessages(groupId: number, limit = 50) {
-  return http(`/api/v1/messages/${groupId}?limit=${limit}`)
+// Messages - supports pagination via beforeId for history loading
+export function getMessages(groupId: number, limit = 50, beforeId?: number) {
+  const q = beforeId != null ? `?limit=${limit}&beforeId=${beforeId}` : `?limit=${limit}`
+  return http(`/api/v1/messages/${groupId}${q}`)
 }
 
-export function getDirectMessages(userId: number, peerId: number, limit = 50) {
-  return http(`/api/v1/messages/direct/${userId}/${peerId}?limit=${limit}`)
+export function getDirectMessages(userId: number, peerId: number, limit = 50, beforeId?: number) {
+  const q = beforeId != null ? `?limit=${limit}&beforeId=${beforeId}` : `?limit=${limit}`
+  return http(`/api/v1/messages/direct/${userId}/${peerId}${q}`)
 }
 
 // Files
-export async function uploadFile(file: File) {
+export async function uploadFile(file: File, uploaderId?: number) {
   const form = new FormData()
   form.append('file', file)
+  if (uploaderId != null) form.append('uploaderId', String(uploaderId))
   return await http('/api/v1/files/upload', { method: 'POST', body: form })
 }

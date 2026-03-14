@@ -1,0 +1,103 @@
+@page
+@model OpenTalk.Pages.Admin.Files.IndexModel
+@{
+    ViewData["Title"] = "文件管理";
+}
+
+<script>
+function csrf() {
+    const el = document.querySelector('input[name="__RequestVerificationToken"]');
+    return el ? el.value : '';
+}
+async function delFile(id) {
+    if (!confirm('确定要删除该文件吗？此操作不可撤销。')) return;
+    const form = new FormData();
+    form.append('id', id);
+    form.append('__RequestVerificationToken', csrf());
+    const res = await fetch('?handler=Delete', { method: 'POST', body: form });
+    if (res.ok || res.redirected) location.reload();
+    else alert('删除失败');
+}
+</script>
+
+<div class="py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">文件管理</h4>
+    <span class="text-muted small">共 @Model.Files.Count() 条（当前页）</span>
+  </div>
+
+  <form method="post">
+    @Html.AntiForgeryToken()
+  </form>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>文件名</th>
+              <th>类型</th>
+              <th>大小</th>
+              <th>上传者</th>
+              <th>上传时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (!Model.Files.Any())
+            {
+              <tr><td colspan="7" class="text-center text-muted py-4">暂无文件</td></tr>
+            }
+            @foreach (var f in Model.Files)
+            {
+              <tr>
+                <td><code>@f.Id</code></td>
+                <td>
+                  <a href="@f.FilePath" target="_blank" class="text-decoration-none">
+                    @f.FileName
+                  </a>
+                </td>
+                <td><span class="badge text-bg-secondary">@f.FileType</span></td>
+                <td>@FormatSize(f.Size)</td>
+                <td>@(f.UploaderName ?? (f.UploaderId.HasValue ? $"ID {f.UploaderId}" : "-"))</td>
+                <td>@f.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td>
+                  <button type="button" class="btn btn-outline-danger btn-sm" onclick="delFile(@f.Id)">删除</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  @if (Model.PageIndex > 0 || Model.HasMore)
+  {
+    <div class="d-flex justify-content-between mt-3">
+      @if (Model.PageIndex > 0)
+      {
+        <a class="btn btn-outline-secondary" href="?page=@(Model.PageIndex - 1)">← 上一页</a>
+      }
+      else
+      {
+        <span></span>
+      }
+      @if (Model.HasMore)
+      {
+        <a class="btn btn-outline-secondary" href="?page=@(Model.PageIndex + 1)">下一页 →</a>
+      }
+    </div>
+  }
+</div>
+
+@functions {
+  static string FormatSize(long bytes)
+  {
+    if (bytes < 1024) return $"{bytes} B";
+    if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+    return $"{bytes / 1024.0 / 1024.0:F1} MB";
+  }
+}

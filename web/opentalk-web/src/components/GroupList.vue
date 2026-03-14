@@ -74,6 +74,10 @@ function formatTime(value?: string) {
 </script>
 
 <style scoped>
+/* 选中项背景色与 hover 一致 */
+:deep(.el-menu-item.is-active) {
+  background-color: var(--el-menu-hover-bg-color) !important;
+}
 .group-aside {
   border-right: 1px solid var(--el-border-color);
   display: flex;

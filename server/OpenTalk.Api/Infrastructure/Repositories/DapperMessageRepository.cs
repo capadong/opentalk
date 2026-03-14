@@ -16,11 +16,23 @@ public class DapperMessageRepository(IDbConnectionFactory db) : IMessageReposito
         return message;
     }
 
-    public async Task<IEnumerable<ChatMessage>> GetByGroupAsync(long groupId, int limit = 50)
+    public async Task<IEnumerable<ChatMessage>> GetByGroupAsync(long groupId, int limit = 50, long? beforeId = null)
     {
-        const string sql = @"SELECT id, group_id AS GroupId, sender_id AS SenderId, type, content, file_url AS FileUrl, created_at AS CreatedAt
-                             FROM messages WHERE group_id = @GroupId ORDER BY id DESC LIMIT @Limit";
+        string sql;
+        object param;
+        if (beforeId.HasValue)
+        {
+            sql = @"SELECT id, group_id AS GroupId, sender_id AS SenderId, type, content, file_url AS FileUrl, created_at AS CreatedAt
+                    FROM messages WHERE group_id = @GroupId AND id < @BeforeId ORDER BY id DESC LIMIT @Limit";
+            param = new { GroupId = groupId, BeforeId = beforeId.Value, Limit = limit };
+        }
+        else
+        {
+            sql = @"SELECT id, group_id AS GroupId, sender_id AS SenderId, type, content, file_url AS FileUrl, created_at AS CreatedAt
+                    FROM messages WHERE group_id = @GroupId ORDER BY id DESC LIMIT @Limit";
+            param = new { GroupId = groupId, Limit = limit };
+        }
         using var conn = db.Create();
-        return await conn.QueryAsync<ChatMessage>(sql, new { GroupId = groupId, Limit = limit });
+        return await conn.QueryAsync<ChatMessage>(sql, param);
     }
 }

@@ -22,10 +22,14 @@
               :members="members"
               :self-user="user"
               :api-base="API_BASE"
+              :loading-more="loadingMore"
+              :no-more="noMore"
+              @load-more="loadMore"
             />
             <MessageInput
               @send-text="onSendText"
               @send-image="onSendImage"
+              @send-file="onSendFile"
             />
           </div>
           <MemberList
@@ -67,6 +71,8 @@ const currentPeer = ref<Member | null>(null)
 const conversationMode = ref<'group' | 'direct'>('group')
 const unread = ref<Record<number, number>>({})
 const groupUnread = ref<Record<number, number>>({})
+const loadingMore = ref(false)
+const noMore = ref(false)
 
 const peerDisplayName = computed(() => {
   if (!currentPeer.value) return ''
@@ -127,12 +133,39 @@ async function onSelect(index: string) {
   conversationMode.value = 'group'
   currentGroup.value = g
   currentPeer.value = null
+  noMore.value = false
   await conn.invoke('JoinGroup', g.id)
   members.value = await getGroupMembers(g.id)
   const list = (await getMessages(g.id, 50)).reverse()
   messages.value = list
+  if (list.length < 50) noMore.value = true
   if (list.length) updateGroupSummary(list[list.length - 1], g)
   groupUnread.value[g.id] = 0
+}
+
+async function loadMore() {
+  if (loadingMore.value || noMore.value) return
+  const firstMsg = messages.value[0]
+  if (!firstMsg) return
+  loadingMore.value = true
+  try {
+    let older: Message[]
+    if (conversationMode.value === 'group' && currentGroup.value) {
+      older = (await getMessages(currentGroup.value.id, 30, firstMsg.id)).reverse()
+    } else if (conversationMode.value === 'direct' && currentPeer.value) {
+      older = (await getDirectMessages(userId, currentPeer.value.userId, 30, firstMsg.id)).reverse()
+    } else {
+      return
+    }
+    if (older.length === 0) {
+      noMore.value = true
+    } else {
+      messages.value = [...older, ...messages.value]
+      if (older.length < 30) noMore.value = true
+    }
+  } finally {
+    loadingMore.value = false
+  }
 }
 
 async function onSendText(content: string) {
@@ -156,7 +189,7 @@ async function onSendText(content: string) {
 }
 
 async function onSendImage(file: File) {
-  const info = await apiUpload(file)
+  const info = await apiUpload(file, userId)
   if (conversationMode.value === 'group') {
     if (!currentGroup.value) return
     await conn.invoke('SendMessage', {
@@ -178,13 +211,39 @@ async function onSendImage(file: File) {
   }
 }
 
+async function onSendFile(file: File) {
+  const info = await apiUpload(file, userId)
+  if (conversationMode.value === 'group') {
+    if (!currentGroup.value) return
+    await conn.invoke('SendMessage', {
+      groupId: currentGroup.value.id,
+      senderId: userId,
+      type: 3,
+      content: file.name,
+      fileUrl: info.url
+    })
+  } else {
+    if (!currentPeer.value) return
+    await conn.invoke('SendDirectMessage', {
+      senderId: userId,
+      receiverId: currentPeer.value.userId,
+      type: 3,
+      content: file.name,
+      fileUrl: info.url
+    })
+  }
+}
+
 async function openDirect(m: Member) {
   if (m.userId === userId) return
   conversationMode.value = 'direct'
   currentPeer.value = m
   currentGroup.value = null
   unread.value[m.userId] = 0
-  messages.value = (await getDirectMessages(userId, m.userId, 50)).reverse()
+  noMore.value = false
+  const list = (await getDirectMessages(userId, m.userId, 50)).reverse()
+  messages.value = list
+  if (list.length < 50) noMore.value = true
 }
 
 function updateGroupSummary(m: Message, g: Group) {
