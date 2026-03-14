@@ -15,11 +15,11 @@ public class DapperUserRepository(IDbConnectionFactory db) : IUserRepository
 
     public async Task<User> InsertAsync(User user)
     {
-        const string sql = @"INSERT INTO users (username, password_hash, nickname, avatar, created_at)
-                             VALUES (@Username, @PasswordHash, @Nickname, @Avatar, @CreatedAt);
-                             SELECT LAST_INSERT_ID();";
         using var conn = db.Create();
-        var id = await conn.ExecuteScalarAsync<long>(sql, user);
+        const string ins = @"INSERT INTO users (username, password_hash, nickname, avatar, created_at)
+                             VALUES (@Username, @PasswordHash, @Nickname, @Avatar, @CreatedAt)";
+        await conn.ExecuteAsync(ins, user);
+        var id = await conn.ExecuteScalarAsync<long>("SELECT LAST_INSERT_ID();");
         user.Id = id;
         return user;
     }

@@ -4,25 +4,62 @@
   ViewData["Title"] = "群组管理";
 }
 <script>
-  async function delGroup(id){ if(confirm('删除该群组？')){ await fetch(`?handler=DeleteGroup&id=${id}`,{method:'POST'}); location.reload(); } }
-  async function addMember(gid){ const uid=prompt('用户ID'); if(!uid) return; await fetch(`?handler=AddMember&gid=${gid}&uid=${uid}`,{method:'POST'}); location.reload(); }
-  async function removeMember(gid,uid){ if(confirm('移除该成员？')){ await fetch(`?handler=RemoveMember&gid=${gid}&uid=${uid}`,{method:'POST'}); location.reload(); } }
+  function csrf() {
+    const el = document.querySelector('input[name="__RequestVerificationToken"]');
+    return el ? el.value : '';
+  }
+  async function delGroup(id){
+    if(!confirm('删除该群组？')) return;
+    await fetch(`?handler=DeleteGroup&id=${id}`,{
+      method:'POST',
+      headers: { 'RequestVerificationToken': csrf() }
+    });
+    location.reload();
+  }
+  async function removeMember(gid,uid){
+    if(!confirm('移除该成员？')) return;
+    await fetch(`?handler=RemoveMember&gid=${gid}&uid=${uid}`,{
+      method:'POST',
+      headers: { 'RequestVerificationToken': csrf() }
+    });
+    location.reload();
+  }
 </script>
 <div class="py-3">
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">新建群组</h5>
-      <form method="post" class="row g-3">
-        <div class="col-md-5">
-          <input class="form-control" name="Name" placeholder="群组名称" required />
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGroupModal">新建群组</button>
+  </div>
+  <div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createGroupModalLabel">新建群组</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="col-md-5">
-          <input class="form-control" name="OwnerId" type="number" placeholder="Owner 用户ID" required />
-        </div>
-        <div class="col-md-2 d-grid">
-          <button class="btn btn-primary" type="submit">创建</button>
-        </div>
-      </form>
+        <form method="post">
+          @Html.AntiForgeryToken()
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">群组名称</label>
+              <input class="form-control" name="Name" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">所有者</label>
+              <select class="form-select" name="OwnerId" required>
+                <option value="">请选择用户</option>
+                @foreach (var u in Model.AllUsers)
+                {
+                  <option value="@u.Id">@u.Id - @u.Username (@u.Nickname)</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="btn btn-primary">创建</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
   <div class="card">
@@ -53,7 +90,7 @@
             </td>
             <td>
               <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-outline-primary" onclick="addMember(@g.Id)">添加成员</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal" onclick="openAddMember(@g.Id)">添加成员</button>
                 <button type="button" class="btn btn-outline-danger" onclick="delGroup(@g.Id)">删除</button>
               </div>
             </td>
@@ -64,4 +101,36 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addMemberModalLabel">添加成员</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="?handler=AddMember">
+          @Html.AntiForgeryToken()
+          <div class="modal-body">
+            <input type="hidden" name="gid" id="addMember_gid" />
+            <div class="mb-3">
+              <label class="form-label">选择用户</label>
+              <select class="form-select" name="uid" multiple size="8" required>
+                @foreach (var u in Model.AllUsers)
+                {
+                  <option value="@u.Id">@u.Id - @u.Username (@u.Nickname)</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="btn btn-primary">添加</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+<script>
+  function openAddMember(gid){ document.getElementById('addMember_gid').value = gid; }
+</script>

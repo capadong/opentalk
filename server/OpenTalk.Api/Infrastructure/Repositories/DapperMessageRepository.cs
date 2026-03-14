@@ -7,11 +7,11 @@ public class DapperMessageRepository(IDbConnectionFactory db) : IMessageReposito
 {
     public async Task<ChatMessage> InsertAsync(ChatMessage message)
     {
-        const string sql = @"INSERT INTO messages (group_id, sender_id, type, content, file_url, created_at)
-                             VALUES (@GroupId, @SenderId, @Type, @Content, @FileUrl, @CreatedAt);
-                             SELECT LAST_INSERT_ID();";
         using var conn = db.Create();
-        var id = await conn.ExecuteScalarAsync<long>(sql, message);
+        const string ins = @"INSERT INTO messages (group_id, sender_id, type, content, file_url, created_at)
+                             VALUES (@GroupId, @SenderId, @Type, @Content, @FileUrl, @CreatedAt)";
+        await conn.ExecuteAsync(ins, message);
+        var id = await conn.ExecuteScalarAsync<long>("SELECT LAST_INSERT_ID();");
         message.Id = id;
         return message;
     }

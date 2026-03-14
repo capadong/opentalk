@@ -5,7 +5,7 @@ using OpenTalk.Infrastructure.Repositories;
 
 namespace OpenTalk.Pages.Admin.Groups;
 
-public class IndexModel(IGroupRepository groups) : PageModel
+public class IndexModel(IGroupRepository groups, IUserRepository usersRepo) : PageModel
 {
     [BindProperty]
     public string Name { get; set; } = "";
@@ -13,10 +13,19 @@ public class IndexModel(IGroupRepository groups) : PageModel
     public long OwnerId { get; set; }
     public IEnumerable<ChatGroup> Groups { get; set; } = [];
     public Dictionary<long, List<GroupMember>> Members { get; set; } = new();
+    public IEnumerable<User> AllUsers { get; set; } = [];
 
     public async Task OnGet()
     {
-        Groups = await groups.ListAsync(OwnerId == 0 ? 1 : OwnerId);
+        if (OwnerId > 0)
+        {
+            Groups = await groups.ListAsync(OwnerId);
+        }
+        else
+        {
+            Groups = await groups.ListAllAsync();
+        }
+        AllUsers = await usersRepo.ListAsync(500, 0);
         Members = new Dictionary<long, List<GroupMember>>();
         foreach (var g in Groups)
         {
@@ -38,10 +47,13 @@ public class IndexModel(IGroupRepository groups) : PageModel
         return new OkResult();
     }
 
-    public async Task<IActionResult> OnPostAddMember(long gid, long uid)
+    public async Task<IActionResult> OnPostAddMember(long gid, long[] uid)
     {
-        await groups.AddMemberAsync(gid, uid, DateTime.UtcNow);
-        return new OkResult();
+        foreach (var u in uid)
+        {
+            await groups.AddMemberAsync(gid, u, DateTime.UtcNow);
+        }
+        return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostRemoveMember(long gid, long uid)

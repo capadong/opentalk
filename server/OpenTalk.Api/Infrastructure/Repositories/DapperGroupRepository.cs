@@ -5,6 +5,14 @@ namespace OpenTalk.Infrastructure.Repositories;
 
 public class DapperGroupRepository(IDbConnectionFactory db) : IGroupRepository
 {
+    public async Task<IEnumerable<ChatGroup>> ListAllAsync()
+    {
+        const string sql = @"SELECT id, name, owner_id AS OwnerId, created_at AS CreatedAt
+                             FROM chat_groups ORDER BY id DESC";
+        using var conn = db.Create();
+        return await conn.QueryAsync<ChatGroup>(sql);
+    }
+
     public async Task<IEnumerable<ChatGroup>> ListAsync(long userId)
     {
         const string sql = @"SELECT g.id, g.name, g.owner_id AS OwnerId, g.created_at AS CreatedAt
@@ -26,11 +34,11 @@ public class DapperGroupRepository(IDbConnectionFactory db) : IGroupRepository
 
     public async Task<long> CreateAsync(ChatGroup group)
     {
-        const string sql = @"INSERT INTO chat_groups (name, owner_id, created_at)
-                             VALUES (@Name, @OwnerId, @CreatedAt);
-                             SELECT LAST_INSERT_ID();";
         using var conn = db.Create();
-        var id = await conn.ExecuteScalarAsync<long>(sql, group);
+        const string ins = @"INSERT INTO chat_groups (name, owner_id, created_at)
+                             VALUES (@Name, @OwnerId, @CreatedAt)";
+        await conn.ExecuteAsync(ins, group);
+        var id = await conn.ExecuteScalarAsync<long>("SELECT LAST_INSERT_ID();");
         group.Id = id;
         return id;
     }
@@ -38,6 +46,7 @@ public class DapperGroupRepository(IDbConnectionFactory db) : IGroupRepository
     public async Task<int> DeleteAsync(long groupId)
     {
         using var conn = db.Create();
+        conn.Open();
         using var tx = conn.BeginTransaction();
         var a = await conn.ExecuteAsync("DELETE FROM group_members WHERE group_id=@GroupId", new { GroupId = groupId }, tx);
         var b = await conn.ExecuteAsync("DELETE FROM messages WHERE group_id=@GroupId", new { GroupId = groupId }, tx);

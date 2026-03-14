@@ -4,26 +4,46 @@
     ViewData["Title"] = "用户管理";
 }
 <script>
-    async function del(id){ if(confirm('删除该用户？')){ await fetch(`?handler=Delete&id=${id}`,{method:'POST'}); location.reload(); } }
+    function csrf(){ const el = document.querySelector('input[name="__RequestVerificationToken"]'); return el ? el.value : ''; }
+    async function del(id){
+      if(!confirm('删除该用户？')) return;
+      await fetch(`?handler=Delete&id=${id}`,{ method:'POST', headers: { 'RequestVerificationToken': csrf() }});
+      location.reload();
+    }
 </script>
 <div class="py-3">
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">新建用户</h5>
-      <form method="post" class="row g-3">
-        <div class="col-md-4">
-          <input class="form-control" name="Username" placeholder="用户名" required />
+  <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">新建用户</button>
+  </div>
+  <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createUserModalLabel">新建用户</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="col-md-4">
-          <input class="form-control" name="Password" type="password" placeholder="密码" required />
-        </div>
-        <div class="col-md-3">
-          <input class="form-control" name="Nickname" placeholder="昵称" />
-        </div>
-        <div class="col-md-1 d-grid">
-          <button class="btn btn-primary" type="submit">创建</button>
-        </div>
-      </form>
+        <form method="post">
+          @Html.AntiForgeryToken()
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">用户名</label>
+              <input class="form-control" name="Username" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">密码</label>
+              <input class="form-control" name="Password" type="password" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">昵称</label>
+              <input class="form-control" name="Nickname" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="btn btn-primary">创建</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
   <div class="card">

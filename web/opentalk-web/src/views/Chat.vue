@@ -36,10 +36,10 @@
                   </template>
                   <div v-if="m.type===1">{{ m.content }}</div>
                   <div v-else-if="m.type===2">
-                    <el-image :src="api + m.fileUrl" style="max-width:280px" fit="contain" :preview-src-list="[api + m.fileUrl]" />
+                    <el-image :src="API_BASE + m.fileUrl" style="max-width:280px" fit="contain" :preview-src-list="[API_BASE + m.fileUrl]" />
                   </div>
                   <div v-else>
-                    <el-link :href="api + m.fileUrl" target="_blank">{{ m.content }}</el-link>
+                    <el-link :href="API_BASE + m.fileUrl" target="_blank">{{ m.content }}</el-link>
                   </div>
                 </el-card>
               </div>
@@ -68,12 +68,12 @@ import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { ChatDotRound, ChatLineRound } from '@element-plus/icons-vue'
+import { API_BASE, getGroups, getMessages, uploadFile as apiUpload } from '../api/http'
 
 type Group = { id: number; name: string }
 type Message = { id:number; groupId:number; senderId:number; type:number; content:string; fileUrl?:string; createdAt?:string }
 
 const router = useRouter()
-const api = 'http://localhost:5000'
 const user = JSON.parse(localStorage.getItem('user') || '{"id":1}')
 const userId = user.id || 1
 
@@ -89,7 +89,7 @@ const filteredGroups = computed(() =>
 )
 
 const conn = new HubConnectionBuilder()
-  .withUrl(`${api}/hubs/chat`)
+  .withUrl(`${API_BASE}/hubs/chat`)
   .configureLogging(LogLevel.Information)
   .withAutomaticReconnect()
   .build()
@@ -104,8 +104,7 @@ conn.on('ReceiveMessage', (m: Message) => {
 onMounted(async () => {
   try {
     await conn.start()
-    const res = await fetch(`${api}/api/v1/groups/${userId}`)
-    groups.value = await res.json()
+    groups.value = await getGroups(userId)
     if (groups.value.length) {
       await onSelect(String(groups.value[0].id))
     } else {
@@ -122,8 +121,7 @@ async function onSelect(index: string) {
   if (!g) return
   currentGroup.value = g
   await conn.invoke('JoinGroup', g.id)
-  const res = await fetch(`${api}/api/v1/messages/${g.id}?limit=50`)
-  messages.value = (await res.json()).reverse()
+  messages.value = (await getMessages(g.id, 50)).reverse()
   setTimeout(() => msgScroll.value?.scrollTo?.({ top: 999999 }), 0)
 }
 
@@ -136,10 +134,7 @@ async function sendText() {
 
 async function onSelectFile(file:any) {
   if (!currentGroup.value) return
-  const form = new FormData()
-  form.append('file', file.raw)
-  const res = await fetch(`${api}/api/v1/files/upload`, { method: 'POST', body: form })
-  const info = await res.json()
+  const info = await apiUpload(file.raw)
   const dto = { groupId: currentGroup.value.id, senderId: userId, type: 2, content: file.name, fileUrl: info.url }
   await conn.invoke('SendMessage', dto)
 }

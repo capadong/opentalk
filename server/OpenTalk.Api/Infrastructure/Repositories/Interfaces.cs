@@ -10,6 +10,7 @@ public interface IMessageRepository
 
 public interface IGroupRepository
 {
+    Task<IEnumerable<ChatGroup>> ListAllAsync();
     Task<IEnumerable<ChatGroup>> ListAsync(long userId);
     Task<bool> IsMemberAsync(long groupId, long userId);
     Task<long> CreateAsync(ChatGroup group);

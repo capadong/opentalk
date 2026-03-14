@@ -21,22 +21,16 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { login as apiLogin } from '../api/http'
 
 const router = useRouter()
 const loading = ref(false)
 const form = reactive({ username: 'capad', password: 'capad' })
-const api = 'https://localhost:49188'
 
 async function login() {
   loading.value = true
   try {
-    const res = await fetch(`${api}/api/v1/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: form.username, password: form.password })
-    })
-    if (!res.ok) throw new Error('登录失败')
-    const data = await res.json()
+    const data = await apiLogin(form.username, form.password)
     localStorage.setItem('token', data.token || 'token')
     localStorage.setItem('user', JSON.stringify(data.user || {}))
     router.push('/chat')
