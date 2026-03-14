@@ -19,7 +19,7 @@ public class AuthController(UserService users) : ControllerBase
     {
         var user = await users.LoginAsync(req.Username, req.Password);
         if (user is null) return Unauthorized();
-        return Ok(new { token = "demo-token", user = new { user.Id, user.Username, user.Nickname } });
+        return Ok(new { token = "demo-token", user = new { user.Id, user.Username, user.Nickname, user.Avatar } });
     }
 }
 

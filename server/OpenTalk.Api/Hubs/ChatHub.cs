@@ -4,10 +4,11 @@ using OpenTalk.Application.DTOs;
 
 namespace OpenTalk.Hubs;
 
-public class ChatHub(MessageService messageService, GroupService groupService) : Hub
+public class ChatHub(MessageService messageService, GroupService groupService, ConnectionTracker tracker) : Hub
 {
     public async Task Register(long userId)
     {
+        tracker.Add(Context.ConnectionId, userId);
         await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
     }
 
@@ -32,5 +33,11 @@ public class ChatHub(MessageService messageService, GroupService groupService) :
         var saved = await messageService.SaveDirectMessageAsync(dto);
         await Clients.Group($"user:{dto.SenderId}").SendAsync("ReceiveDirectMessage", saved);
         await Clients.Group($"user:{dto.ReceiverId}").SendAsync("ReceiveDirectMessage", saved);
+    }
+
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        tracker.Remove(Context.ConnectionId);
+        return base.OnDisconnectedAsync(exception);
     }
 }

@@ -14,6 +14,8 @@ public class IndexModel(UserService userService, IUserRepository users) : PageMo
     public string Password { get; set; } = "";
     [BindProperty]
     public string? Nickname { get; set; }
+    [BindProperty]
+    public string? Avatar { get; set; }
     public IEnumerable<User> Users { get; set; } = [];
 
     public async Task OnGet()
@@ -23,7 +25,12 @@ public class IndexModel(UserService userService, IUserRepository users) : PageMo
 
     public async Task<IActionResult> OnPost()
     {
-        await userService.RegisterAsync(Username, Password, Nickname);
+        var user = await userService.RegisterAsync(Username, Password, Nickname);
+        if (!string.IsNullOrEmpty(Avatar))
+        {
+            user.Avatar = Avatar;
+            await users.UpdateAsync(user);
+        }
         return RedirectToPage();
     }
 
@@ -31,5 +38,18 @@ public class IndexModel(UserService userService, IUserRepository users) : PageMo
     {
         await users.DeleteAsync(id);
         return new OkResult();
+    }
+
+    public async Task<IActionResult> OnPostEdit(long id, string username, string? nickname, string? avatar)
+    {
+        var user = new User
+        {
+            Id = id,
+            Username = username,
+            Nickname = nickname,
+            Avatar = avatar
+        };
+        await users.UpdateAsync(user);
+        return RedirectToPage();
     }
 }

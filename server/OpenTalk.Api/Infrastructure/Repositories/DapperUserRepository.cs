@@ -32,6 +32,13 @@ public class DapperUserRepository(IDbConnectionFactory db) : IUserRepository
         return await conn.QueryAsync<User>(sql, new { Limit = limit, Offset = offset });
     }
 
+    public async Task<int> UpdateAsync(User user)
+    {
+        const string sql = @"UPDATE users SET username = @Username, nickname = @Nickname, avatar = @Avatar WHERE id = @Id";
+        using var conn = db.Create();
+        return await conn.ExecuteAsync(sql, user);
+    }
+
     public async Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<long> ids)
     {
         const string sql = @"SELECT id, username, password_hash AS PasswordHash, nickname, avatar, created_at AS CreatedAt

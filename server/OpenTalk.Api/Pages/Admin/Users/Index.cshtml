@@ -4,12 +4,22 @@
     ViewData["Title"] = "用户管理";
 }
 <script>
-    function csrf(){ const el = document.querySelector('input[name="__RequestVerificationToken"]'); return el ? el.value : ''; }
-    async function del(id){
-      if(!confirm('删除该用户？')) return;
-      await fetch(`?handler=Delete&id=${id}`,{ method:'POST', headers: { 'RequestVerificationToken': csrf() }});
-      location.reload();
-    }
+  function csrf(){ const el = document.querySelector('input[name="__RequestVerificationToken"]'); return el ? el.value : ''; }
+  async function del(id){
+    if(!confirm('删除该用户？')) return;
+    await fetch(`?handler=Delete&id=${id}`,{ method:'POST', headers: { 'RequestVerificationToken': csrf() }});
+    location.reload();
+  }
+  function openEdit(btn){
+    const id = btn.getAttribute('data-id');
+    const username = btn.getAttribute('data-username') || '';
+    const nickname = btn.getAttribute('data-nickname') || '';
+    const avatar = btn.getAttribute('data-avatar') || '';
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_username').value = username;
+    document.getElementById('edit_nickname').value = nickname;
+    document.getElementById('edit_avatar').value = avatar;
+  }
 </script>
 <div class="py-3">
   <div class="d-flex justify-content-end mb-3">
@@ -37,6 +47,10 @@
               <label class="form-label">昵称</label>
               <input class="form-control" name="Nickname" />
             </div>
+            <div class="mb-3">
+              <label class="form-label">头像 URL</label>
+              <input class="form-control" name="Avatar" />
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -50,21 +64,70 @@
     <div class="card-body">
       <h5 class="card-title">用户列表</h5>
       <div class="table-responsive">
-      <table class="table table-striped">
-        <thead><tr><th>Id</th><th>Username</th><th>Nickname</th><th>Created</th><th>操作</th></tr></thead>
+      <table class="table table-striped align-middle">
+        <thead><tr><th>Id</th><th>Avatar</th><th>Username</th><th>Nickname</th><th>Created</th><th>操作</th></tr></thead>
         <tbody>
         @foreach (var u in Model.Users)
         {
             <tr>
-                <td>@u.Id</td>
-                <td>@u.Username</td>
-                <td>@u.Nickname</td>
-                <td>@u.CreatedAt</td>
-                <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="del(@u.Id)">删除</button></td>
+              <td>@u.Id</td>
+              <td>
+                @if (!string.IsNullOrEmpty(u.Avatar))
+                {
+                  <img src="@u.Avatar" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;" />
+                }
+              </td>
+              <td>@u.Username</td>
+              <td>@u.Nickname</td>
+              <td>@u.CreatedAt</td>
+              <td>
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary me-1"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editUserModal"
+                        data-id="@u.Id"
+                        data-username="@u.Username"
+                        data-nickname="@u.Nickname"
+                        data-avatar="@u.Avatar"
+                        onclick="openEdit(this)">编辑</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="del(@u.Id)">删除</button>
+              </td>
             </tr>
         }
         </tbody>
       </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserModalLabel">编辑用户</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="?handler=Edit">
+          @Html.AntiForgeryToken()
+          <div class="modal-body">
+            <input type="hidden" name="Id" id="edit_id" />
+            <div class="mb-3">
+              <label class="form-label">用户名</label>
+              <input class="form-control" name="Username" id="edit_username" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">昵称</label>
+              <input class="form-control" name="Nickname" id="edit_nickname" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">头像 URL</label>
+              <input class="form-control" name="Avatar" id="edit_avatar" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

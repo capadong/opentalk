@@ -50,6 +50,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
 });
 
+builder.Services.AddSingleton<ConnectionTracker>();
 builder.Services.AddSingleton<IDbConnectionFactory>(_ =>
     new MySqlConnectionFactory(builder.Configuration.GetConnectionString("Default") ?? ""));
 builder.Services.AddScoped<IMessageRepository, DapperMessageRepository>();
@@ -59,6 +60,7 @@ builder.Services.AddScoped<IUserRepository, DapperUserRepository>();
 builder.Services.AddScoped<MessageService>();
 builder.Services.AddScoped<GroupService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<StatsService>();
 
 var app = builder.Build();
 

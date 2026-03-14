@@ -32,5 +32,6 @@ public interface IUserRepository
     Task<User> InsertAsync(User user);
     Task<IEnumerable<User>> ListAsync(int limit = 100, int offset = 0);
     Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<long> ids);
+    Task<int> UpdateAsync(User user);
     Task<int> DeleteAsync(long id);
 }

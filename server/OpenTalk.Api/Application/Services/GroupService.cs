@@ -3,7 +3,7 @@ using OpenTalk.Infrastructure.Repositories;
 
 namespace OpenTalk.Application.Services;
 
-public record GroupMemberDto(long UserId, string Username, string? Nickname, DateTime JoinedAt);
+public record GroupMemberDto(long UserId, string Username, string? Nickname, string? Avatar, DateTime JoinedAt);
 
 public class GroupService(IGroupRepository groups, IUserRepository users)
 {
@@ -25,7 +25,8 @@ public class GroupService(IGroupRepository groups, IUserRepository users)
             dict.TryGetValue(m.UserId, out var u);
             var username = u?.Username ?? $"用户 {m.UserId}";
             var nickname = u?.Nickname;
-            return new GroupMemberDto(m.UserId, username, nickname, m.JoinedAt);
+            var avatar = u?.Avatar;
+            return new GroupMemberDto(m.UserId, username, nickname, avatar, m.JoinedAt);
         });
     }
 }
