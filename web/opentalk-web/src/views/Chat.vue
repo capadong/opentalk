@@ -95,16 +95,27 @@
                 </div>
               </div>
             </el-scrollbar>
-            <div style="height:150px;border-top:1px solid var(--el-border-color);padding:8px;display:flex;flex-direction:column;gap:8px">
+            <div style="border-top:1px solid var(--el-border-color);padding:8px 12px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:12px;font-size:18px;color:var(--el-text-color-secondary)">
+                <span title="表情" style="cursor:pointer;user-select:none">😊</span>
+              </div>
               <div v-if="pendingImageUrl" style="padding-bottom:4px">
                 <el-image :src="pendingImageUrl" style="max-width:160px;max-height:160px" fit="contain" />
               </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <el-input v-model="text" placeholder="输入消息，回车发送" @keyup.enter="sendText"></el-input>
-                <el-upload :auto-upload="false" :show-file-list="false" :on-change="onSelectFile">
-                  <el-button>图片</el-button>
-                </el-upload>
-                <el-button type="primary" @click="sendText">发送</el-button>
+              <div style="display:flex;align-items:flex-start;gap:12px">
+                <el-input
+                  v-model="text"
+                  type="textarea"
+                  :autosize="{ minRows: 3, maxRows: 6 }"
+                  placeholder="输入消息，回车发送"
+                  @keyup.enter="sendText"
+                />
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <el-upload :auto-upload="false" :show-file-list="false" :on-change="onSelectFile">
+                    <el-button>图片</el-button>
+                  </el-upload>
+                  <el-button type="primary" @click="sendText" style="margin-top:auto">发送</el-button>
+                </div>
               </div>
             </div>
           </div>
