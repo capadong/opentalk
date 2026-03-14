@@ -71,19 +71,19 @@
                     flexDirection: m.senderId === userId ? 'row-reverse' : 'row',
                     alignItems:'flex-start',
                     gap:'8px',
-                    maxWidth:'70%'
+                    maxWidth:'100%'
                   }"
                 >
                   <el-avatar :size="36" :src="avatarOf(m.senderId)">
                     {{ displayName(m.senderId).charAt(0) }}
                   </el-avatar>
-                  <el-card shadow="never" style="max-width:100%">
-                    <template #header>
+                  <el-card shadow="never" style="max-width:520px">
+                    <!-- <template #header>
                       <div style="display:flex;justify-content:space-between">
                         <span>{{ displayName(m.senderId) }}</span>
                         <span style="opacity:.6">{{ new Date(m.createdAt || new Date()).toLocaleString() }}</span>
                       </div>
-                    </template>
+                    </template> -->
                     <div v-if="m.type===1">{{ m.content }}</div>
                     <div v-else-if="m.type===2">
                       <el-image :src="API_BASE + m.fileUrl" style="max-width:280px" fit="contain" :preview-src-list="[API_BASE + m.fileUrl]" />
@@ -96,13 +96,11 @@
               </div>
             </el-scrollbar>
             <div style="border-top:1px solid var(--el-border-color);padding:8px 12px;display:flex;flex-direction:column;gap:8px">
-              <div style="display:flex;align-items:center;gap:12px;font-size:18px;color:var(--el-text-color-secondary)">
-                <span title="表情" style="cursor:pointer;user-select:none">😊</span>
-              </div>
+              <ChatToolbar @emoji="insertEmoji" @image="handleToolbarImage" />
               <div v-if="pendingImageUrl" style="padding-bottom:4px">
                 <el-image :src="pendingImageUrl" style="max-width:160px;max-height:160px" fit="contain" />
               </div>
-              <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="display:flex;align-items:flex-end;gap:12px">
                 <el-input
                   v-model="text"
                   type="textarea"
@@ -111,9 +109,6 @@
                   @keyup.enter="sendText"
                 />
                 <div style="display:flex;flex-direction:column;gap:8px">
-                  <el-upload :auto-upload="false" :show-file-list="false" :on-change="onSelectFile">
-                    <el-button>图片</el-button>
-                  </el-upload>
                   <el-button type="primary" @click="sendText" style="margin-top:auto">发送</el-button>
                 </div>
               </div>
@@ -154,6 +149,7 @@ import { ElMessage, ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { ChatDotRound, ChatLineRound } from '@element-plus/icons-vue'
 import { API_BASE, getGroups, getMessages, getGroupMembers, getDirectMessages, uploadFile as apiUpload } from '../api/http'
+import ChatToolbar from '../components/ChatToolbar.vue'
 
 type Group = { id: number; name: string; lastContent?:string; lastCreatedAt?:string }
 type Message = { id:number; groupId?:number; senderId:number; receiverId?:number; type:number; content:string; fileUrl?:string; createdAt?:string }
@@ -264,6 +260,10 @@ function handlePaste(e: ClipboardEvent) {
 
 window.addEventListener('paste', handlePaste)
 
+function insertEmoji(emoji: string) {
+  text.value += emoji
+}
+
 async function onSelect(index: string) {
   const id = Number(index)
   const g = groups.value.find(x => x.id === id)
@@ -316,6 +316,15 @@ async function sendText() {
   }
   pendingImage.value = null
   pendingImageUrl.value = null
+}
+
+async function handleToolbarImage(file: File) {
+  if (!file) return
+  if (pendingImageUrl.value) {
+    URL.revokeObjectURL(pendingImageUrl.value)
+  }
+  pendingImage.value = file
+  pendingImageUrl.value = URL.createObjectURL(file)
 }
 
 async function onSelectFile(file:any) {
