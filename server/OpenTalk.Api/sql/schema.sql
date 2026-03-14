@@ -1,0 +1,43 @@
+-- OpenTalk MySQL schema
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(64) NOT NULL UNIQUE,
+  password_hash VARCHAR(128) NOT NULL,
+  nickname VARCHAR(64),
+  avatar VARCHAR(256),
+  created_at DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS chat_groups (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL,
+  owner_id BIGINT NOT NULL,
+  created_at DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS group_members (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  group_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  joined_at DATETIME NOT NULL,
+  UNIQUE KEY uniq_member (group_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  group_id BIGINT NOT NULL,
+  sender_id BIGINT NOT NULL,
+  type INT NOT NULL,
+  content TEXT NOT NULL,
+  file_url VARCHAR(512),
+  created_at DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS files (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  file_name VARCHAR(256) NOT NULL,
+  file_path VARCHAR(512) NOT NULL,
+  size BIGINT NOT NULL,
+  uploader_id BIGINT,
+  created_at DATETIME NOT NULL
+);
