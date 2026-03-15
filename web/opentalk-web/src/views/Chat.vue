@@ -1,46 +1,46 @@
 <template>
-  <el-container style="height:100vh">
+  <div class="chat-root">
+    <!-- 侧边群组列表 -->
     <GroupList
       :groups="groups"
       :active-id="currentGroup?.id"
       :unread="groupUnread"
       @select="onSelect"
     />
-    <el-container style="flex-direction: column;">
+    <!-- 主内容区 -->
+    <div class="chat-main-wrap">
       <ChatHeader
         :mode="conversationMode"
         :group-name="currentGroup?.name"
         :peer-name="peerDisplayName"
         @logout="logout"
       />
-      <el-container>
-        <el-main class="chat-main">
-          <div class="chat-body">
-            <MessageList
-              :messages="messages"
-              :self-id="userId"
-              :members="members"
-              :self-user="user"
-              :api-base="API_BASE"
-              :loading-more="loadingMore"
-              :no-more="noMore"
-              @load-more="loadMore"
-            />
-            <MessageInput
-              @send-text="onSendText"
-              @send-image="onSendImage"
-              @send-file="onSendFile"
-            />
-          </div>
-          <MemberList
+      <div class="chat-body">
+        <div class="chat-messages-col">
+          <MessageList
+            :messages="messages"
+            :self-id="userId"
             :members="members"
-            :unread="unread"
-            @open-direct="openDirect"
+            :self-user="user"
+            :api-base="API_BASE"
+            :loading-more="loadingMore"
+            :no-more="noMore"
+            @load-more="loadMore"
           />
-        </el-main>
-      </el-container>
-    </el-container>
-  </el-container>
+          <MessageInput
+            @send-text="onSendText"
+            @send-image="onSendImage"
+            @send-file="onSendFile"
+          />
+        </div>
+        <MemberList
+          :members="members"
+          :unread="unread"
+          @open-direct="openDirect"
+        />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -57,7 +57,7 @@ import MemberList from '../components/MemberList.vue'
 
 type Group = { id: number; name: string; lastContent?: string; lastCreatedAt?: string }
 type Message = { id: number; groupId?: number; senderId: number; receiverId?: number; type: number; content: string; fileUrl?: string; createdAt?: string }
-type Member = { userId: number; username: string; nickname?: string; avatar?: string; joinedAt: string }
+type Member = { userId: number; username: string; nickname?: string; avatar?: string; joinedAt?: string }
 
 const router = useRouter()
 const user = JSON.parse(localStorage.getItem('user') || '{"id":1}')
@@ -268,14 +268,35 @@ function logout() {
 </script>
 
 <style scoped>
-.chat-main {
-  padding: 0;
+.chat-root {
   display: flex;
-  height: calc(100vh - 56px);
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--ot-bg-base);
+  font-family: 'Noto Sans SC', 'PingFang SC', sans-serif;
 }
-.chat-body {
+
+.chat-main-wrap {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  background: var(--ot-bg-base);
+}
+
+.chat-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-messages-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
 }
 </style>

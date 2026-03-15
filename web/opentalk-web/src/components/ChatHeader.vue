@@ -1,25 +1,46 @@
 <template>
-  <el-header height="56px" class="chat-header">
-    <div class="chat-header-title">
-      <el-icon><ChatLineRound /></el-icon>
-      <span class="title-text">
-        <template v-if="mode === 'group'">
-          {{ groupName || '未选择群组' }}
-        </template>
-        <template v-else>
-          与 {{ peerName }} 私聊
-        </template>
-      </span>
+  <header class="chat-header">
+    <div class="header-left">
+      <div class="header-icon-wrap">
+        <svg v-if="mode === 'group'" viewBox="0 0 24 24" fill="none" class="header-svg">
+          <path d="M17 8C17 10.7614 14.7614 13 12 13C9.23858 13 7 10.7614 7 8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8Z" fill="currentColor" opacity="0.8"/>
+          <path d="M3 21C3 17.134 7.02944 14 12 14C16.9706 14 21 17.134 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="19" cy="8" r="2.5" fill="currentColor" opacity="0.5"/>
+          <circle cx="5" cy="8" r="2.5" fill="currentColor" opacity="0.5"/>
+        </svg>
+        <svg v-else viewBox="0 0 24 24" fill="none" class="header-svg">
+          <circle cx="12" cy="8" r="4" fill="currentColor" opacity="0.9"/>
+          <path d="M4 20C4 16.6863 7.58172 14 12 14C16.4183 14 20 16.6863 20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M18 3L21 6M21 3L18 6" stroke="var(--ot-accent)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="header-title-block">
+        <span class="header-title">
+          <template v-if="mode === 'group'">{{ groupName || '未选择群组' }}</template>
+          <template v-else>{{ peerName }}</template>
+        </span>
+        <span class="header-subtitle">
+          <template v-if="mode === 'group'">群聊</template>
+          <template v-else>私信对话</template>
+        </span>
+      </div>
     </div>
-    <div>
-      <el-button size="small" @click="emit('logout')">退出登录</el-button>
+    <div class="header-right">
+      <div class="status-dot"></div>
+      <span class="status-text">在线</span>
+      <button class="logout-btn" @click="emit('logout')">
+        <svg viewBox="0 0 24 24" fill="none" width="15" height="15">
+          <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        退出
+      </button>
     </div>
-  </el-header>
+  </header>
 </template>
 
 <script setup lang="ts">
-import { ChatLineRound } from '@element-plus/icons-vue'
-
 defineProps<{
   mode: 'group' | 'direct'
   groupName?: string | null
@@ -33,17 +54,121 @@ const emit = defineEmits<{
 
 <style scoped>
 .chat-header {
+  height: 60px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--el-border-color);
+  padding: 0 20px;
+  background: var(--ot-bg-panel);
+  border-bottom: 1px solid var(--ot-border);
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 10;
 }
-.chat-header-title {
+
+.chat-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ot-accent-dim), transparent);
+  opacity: 0.6;
+}
+
+.header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
-.title-text {
-  font-weight: 600;
+
+.header-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--ot-accent-dim), var(--ot-accent-glow));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ot-accent);
+  border: 1px solid var(--ot-accent-dim);
+  box-shadow: 0 0 12px var(--ot-accent-glow);
+}
+
+.header-svg {
+  width: 20px;
+  height: 20px;
+}
+
+.header-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ot-text-primary);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.header-subtitle {
+  font-size: 11px;
+  color: var(--ot-text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ot-green);
+  box-shadow: 0 0 6px var(--ot-green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+.status-text {
+  font-size: 12px;
+  color: var(--ot-green);
+  letter-spacing: 0.04em;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--ot-border);
+  background: transparent;
+  color: var(--ot-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+}
+
+.logout-btn:hover {
+  border-color: var(--ot-red-dim);
+  color: var(--ot-red);
+  background: var(--ot-red-glow);
+  box-shadow: 0 0 10px var(--ot-red-glow);
 }
 </style>
