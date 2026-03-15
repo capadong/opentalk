@@ -6,7 +6,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap');
 
 /* ===================== OpenTalk Design Tokens ===================== */
-:root {
+:root,
+[data-theme="dark"] {
   /* Base backgrounds */
   --ot-bg-base:        #0d1117;
   --ot-bg-sidebar:     #0a0e14;
@@ -44,6 +45,45 @@
   --ot-avatar-b:       #6366f1;
 }
 
+/* ===================== Light Theme ===================== */
+[data-theme="light"] {
+  /* Base backgrounds */
+  --ot-bg-base:        #f0f2f5;
+  --ot-bg-sidebar:     #e8eaed;
+  --ot-bg-panel:       #ffffff;
+  --ot-bg-input:       #f5f7fa;
+  --ot-bg-hover:       rgba(37,99,235,0.06);
+  --ot-bg-active:      rgba(37,99,235,0.10);
+  --ot-bg-bubble-other: #ffffff;
+
+  /* Borders */
+  --ot-border:         rgba(0,0,0,0.09);
+
+  /* Text */
+  --ot-text-primary:   #1a202c;
+  --ot-text-secondary: #4a5568;
+  --ot-text-muted:     #a0aec0;
+
+  /* Accent — vivid blue */
+  --ot-accent:         #2563eb;
+  --ot-accent-dim:     rgba(37,99,235,0.12);
+  --ot-accent-glow:    rgba(37,99,235,0.15);
+
+  /* Self message bubble gradient */
+  --ot-accent-self-a:  #2563eb;
+  --ot-accent-self-b:  #7c3aed;
+
+  /* Status */
+  --ot-green:          #10b981;
+  --ot-red:            #ef4444;
+  --ot-red-dim:        rgba(239,68,68,0.20);
+  --ot-red-glow:       rgba(239,68,68,0.08);
+
+  /* Avatar gradient palette defaults */
+  --ot-avatar-a:       #2563eb;
+  --ot-avatar-b:       #7c3aed;
+}
+
 /* ===================== Global Reset ===================== */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -58,6 +98,7 @@ html, body {
   font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 0.25s, color 0.25s;
 }
 
 #app {
@@ -119,6 +160,6 @@ html, body {
 /* Scrollbar global */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+::-webkit-scrollbar-thumb { background: var(--ot-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ot-text-muted); border-radius: 3px; }
 </style>

@@ -13,7 +13,9 @@
         :mode="conversationMode"
         :group-name="currentGroup?.name"
         :peer-name="peerDisplayName"
+        :is-dark="isDark"
         @logout="logout"
+        @toggle-theme="toggleTheme"
       />
       <div class="chat-body">
         <div class="chat-messages-col">
@@ -44,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
 import { ElMessage, ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -62,6 +64,24 @@ type Member = { userId: number; username: string; nickname?: string; avatar?: st
 const router = useRouter()
 const user = JSON.parse(localStorage.getItem('user') || '{"id":1}')
 const userId: number = user.id || 1
+
+// ── Theme ──────────────────────────────────────────────────
+const isDark = ref(localStorage.getItem('ot-theme') !== 'light')
+
+function applyTheme(dark: boolean) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+}
+
+applyTheme(isDark.value)
+
+watch(isDark, (val) => {
+  applyTheme(val)
+  localStorage.setItem('ot-theme', val ? 'dark' : 'light')
+})
+
+function toggleTheme() {
+  isDark.value = !isDark.value
+}
 
 const groups = ref<Group[]>([])
 const messages = ref<Message[]>([])

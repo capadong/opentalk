@@ -28,6 +28,17 @@
     <div class="header-right">
       <div class="status-dot"></div>
       <span class="status-text">在线</span>
+      <button class="theme-btn" @click="emit('toggle-theme')" :title="isDark ? '切换到浅色模式' : '切换到深色模式'">
+        <!-- Sun icon (shown in dark mode → click to go light) -->
+        <svg v-if="isDark" viewBox="0 0 24 24" fill="none" width="16" height="16">
+          <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <!-- Moon icon (shown in light mode → click to go dark) -->
+        <svg v-else viewBox="0 0 24 24" fill="none" width="16" height="16">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <button class="logout-btn" @click="emit('logout')">
         <svg viewBox="0 0 24 24" fill="none" width="15" height="15">
           <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -45,10 +56,12 @@ defineProps<{
   mode: 'group' | 'direct'
   groupName?: string | null
   peerName?: string
+  isDark?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'logout'): void
+  (e: 'toggle-theme'): void
 }>()
 </script>
 
@@ -147,6 +160,29 @@ const emit = defineEmits<{
   font-size: 12px;
   color: var(--ot-green);
   letter-spacing: 0.04em;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--ot-border);
+  background: transparent;
+  color: var(--ot-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.theme-btn:hover {
+  border-color: var(--ot-accent-dim);
+  color: var(--ot-accent);
+  background: var(--ot-accent-dim);
+  box-shadow: 0 0 10px var(--ot-accent-glow);
 }
 
 .logout-btn {
