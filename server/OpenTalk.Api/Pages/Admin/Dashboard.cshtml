@@ -4,12 +4,12 @@
     ViewData["Title"] = "Dashboard";
 }
 <div class="py-4">
-  <div class="row g-3">
+  <div class="row g-3 mb-3">
     <div class="col-md-3">
       <div class="card text-bg-primary mb-3 shadow-sm">
         <div class="card-body">
           <div class="card-title fs-5">在线连接</div>
-          <div class="display-6">@Model.OnlineConnections</div>
+          <div class="display-6" id="stat-online">@Model.OnlineConnections</div>
         </div>
       </div>
     </div>
@@ -17,7 +17,7 @@
       <div class="card text-bg-success mb-3 shadow-sm">
         <div class="card-body">
           <div class="card-title fs-5">今日消息</div>
-          <div class="display-6">@Model.TodayMessages</div>
+          <div class="display-6" id="stat-today">@Model.TodayMessages</div>
         </div>
       </div>
     </div>
@@ -25,7 +25,7 @@
       <div class="card text-bg-secondary mb-3 shadow-sm">
         <div class="card-body">
           <div class="card-title fs-5">用户总数</div>
-          <div class="display-6">@Model.UserCount</div>
+          <div class="display-6" id="stat-users">@Model.UserCount</div>
         </div>
       </div>
     </div>
@@ -33,11 +33,20 @@
       <div class="card text-bg-warning mb-3 shadow-sm">
         <div class="card-body">
           <div class="card-title fs-5">群组总数</div>
-          <div class="display-6">@Model.GroupCount</div>
+          <div class="display-6" id="stat-groups">@Model.GroupCount</div>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <span class="badge bg-success" id="refresh-badge">
+      <span id="refresh-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:5px;vertical-align:middle;"></span>
+      实时更新中
+    </span>
+    <small class="text-muted">每 5 秒自动刷新 &nbsp;|&nbsp; 上次更新: <span id="last-updated">—</span></small>
+  </div>
+
   <div class="card shadow-sm">
     <div class="card-body">
       <h5 class="card-title mb-3">快捷入口</h5>
@@ -48,3 +57,50 @@
     </div>
   </div>
 </div>
+
+<script>
+(function () {
+  var interval = 5000;
+  var dot = document.getElementById('refresh-dot');
+  var badge = document.getElementById('refresh-badge');
+  var lastUpdated = document.getElementById('last-updated');
+
+  function flash() {
+    dot.style.opacity = '0.3';
+    setTimeout(function () { dot.style.opacity = '1'; }, 300);
+  }
+
+  function setError() {
+    badge.className = 'badge bg-danger';
+    badge.querySelector('#refresh-dot').style.background = '#fff';
+  }
+
+  function setOk() {
+    badge.className = 'badge bg-success';
+  }
+
+  function fetchStats() {
+    fetch('/api/v1/stats')
+      .then(function (r) {
+        if (!r.ok) throw new Error('fetch failed');
+        return r.json();
+      })
+      .then(function (d) {
+        document.getElementById('stat-online').textContent = d.onlineConnections;
+        document.getElementById('stat-today').textContent  = d.todayMessages;
+        document.getElementById('stat-users').textContent  = d.userCount;
+        document.getElementById('stat-groups').textContent = d.groupCount;
+        flash();
+        setOk();
+        var now = new Date();
+        lastUpdated.textContent = now.toLocaleTimeString('zh-CN');
+      })
+      .catch(function () {
+        setError();
+      });
+  }
+
+  setInterval(fetchStats, interval);
+  fetchStats();
+})();
+</script>

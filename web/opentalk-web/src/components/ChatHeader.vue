@@ -26,8 +26,8 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="status-dot"></div>
-      <span class="status-text">在线</span>
+      <div class="status-dot" :class="statusClass"></div>
+      <span class="status-text" :class="statusClass">{{ statusText }}</span>
       <button class="theme-btn" @click="emit('toggle-theme')" :title="isDark ? '切换到浅色模式' : '切换到深色模式'">
         <!-- Sun icon (shown in dark mode → click to go light) -->
         <svg v-if="isDark" viewBox="0 0 24 24" fill="none" width="16" height="16">
@@ -52,17 +52,39 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   mode: 'group' | 'direct'
   groupName?: string | null
   peerName?: string
   isDark?: boolean
+  connectionState?: 'connecting' | 'connected' | 'reconnecting' | 'disconnected'
 }>()
 
 const emit = defineEmits<{
   (e: 'logout'): void
   (e: 'toggle-theme'): void
 }>()
+
+const statusText = computed(() => {
+  switch (props.connectionState) {
+    case 'connected':     return '在线'
+    case 'connecting':    return '连接中'
+    case 'reconnecting':  return '重连中'
+    case 'disconnected':  return '已断线'
+    default:              return '连接中'
+  }
+})
+
+const statusClass = computed(() => {
+  switch (props.connectionState) {
+    case 'connected':    return 'status-online'
+    case 'reconnecting': return 'status-warn'
+    case 'disconnected': return 'status-offline'
+    default:             return 'status-warn'
+  }
+})
 </script>
 
 <style scoped>
@@ -146,10 +168,12 @@ const emit = defineEmits<{
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--ot-green);
-  box-shadow: 0 0 6px var(--ot-green);
   animation: pulse-dot 2s ease-in-out infinite;
 }
+
+.status-dot.status-online  { background: var(--ot-green);  box-shadow: 0 0 6px var(--ot-green); }
+.status-dot.status-warn    { background: #f59e0b;            box-shadow: 0 0 6px #f59e0b; }
+.status-dot.status-offline { background: var(--ot-red);    box-shadow: 0 0 6px var(--ot-red);  animation: none; }
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -158,9 +182,11 @@ const emit = defineEmits<{
 
 .status-text {
   font-size: 12px;
-  color: var(--ot-green);
   letter-spacing: 0.04em;
 }
+.status-text.status-online  { color: var(--ot-green); }
+.status-text.status-warn    { color: #f59e0b; }
+.status-text.status-offline { color: var(--ot-red); }
 
 .theme-btn {
   display: flex;

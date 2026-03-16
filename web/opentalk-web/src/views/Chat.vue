@@ -14,6 +14,7 @@
         :group-name="currentGroup?.name"
         :peer-name="peerDisplayName"
         :is-dark="isDark"
+        :connection-state="connectionState"
         @logout="logout"
         @toggle-theme="toggleTheme"
       />
@@ -100,11 +101,18 @@ const peerDisplayName = computed(() => {
   return p.nickname || p.username || `用户 ${p.userId}`
 })
 
+type ConnState = 'connecting' | 'connected' | 'reconnecting' | 'disconnected'
+const connectionState = ref<ConnState>('connecting')
+
 const conn = new HubConnectionBuilder()
   .withUrl(`${API_BASE}/hubs/chat`)
   .configureLogging(LogLevel.Information)
   .withAutomaticReconnect()
   .build()
+
+conn.onreconnecting(() => { connectionState.value = 'reconnecting' })
+conn.onreconnected(() => { connectionState.value = 'connected' })
+conn.onclose(() => { connectionState.value = 'disconnected' })
 
 conn.on('ReceiveMessage', (m: Message) => {
   if (!m.groupId) return
@@ -134,6 +142,7 @@ conn.on('ReceiveDirectMessage', (m: Message) => {
 onMounted(async () => {
   try {
     await conn.start()
+    connectionState.value = 'connected'
     await conn.invoke('Register', userId)
     groups.value = await getGroups(userId)
     if (groups.value.length) {
