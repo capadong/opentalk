@@ -13,6 +13,10 @@ A modern, real-time chat application with group messaging and direct messaging c
 - **Dark Mode**: Toggle between light and dark themes
 - **Message History**: Persistent message storage with pagination support
 
+## Screenshots
+
+![OpenTalk Preview](screenshot/image.png)
+
 ## Tech Stack
 
 ### Backend
