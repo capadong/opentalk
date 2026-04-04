@@ -1,9 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:OpenTalk.ViewModels"
+        xmlns:model="using:OpenTalk.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
+        x:Name="RootWindow"
         x:Class="OpenTalk.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Width="1360"
@@ -20,17 +22,6 @@
             <Setter Property="FontSize" Value="22"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
-        <Style Selector="Button.sidebar">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#C7D2FE"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="14,12"/>
-            <Setter Property="CornerRadius" Value="14"/>
-        </Style>
-        <Style Selector="Button.sidebar:pointerover">
-            <Setter Property="Background" Value="#1D2740"/>
-        </Style>
         <Style Selector="Button.panelAction">
             <Setter Property="Background" Value="#18213A"/>
             <Setter Property="BorderBrush" Value="#253052"/>
@@ -38,6 +29,18 @@
             <Setter Property="Foreground" Value="#E5E7EB"/>
             <Setter Property="Padding" Value="14,8"/>
             <Setter Property="CornerRadius" Value="12"/>
+        </Style>
+        <Style Selector="Button.memberAction">
+            <Setter Property="Background" Value="#121A2E"/>
+            <Setter Property="BorderBrush" Value="#22304D"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+        <Style Selector="Button.memberAction:pointerover">
+            <Setter Property="Background" Value="#1A2540"/>
         </Style>
         <Style Selector="Border.selfBubble">
             <Setter Property="Background" Value="#2D6DF6"/>
@@ -56,7 +59,7 @@
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Top" Spacing="10">
                     <TextBlock Classes="heading" Text="OpenTalk"/>
-                    <TextBlock Foreground="#94A3B8" Text="Avalonia Client · 群聊"/>
+                    <TextBlock Foreground="#94A3B8" Text="Avalonia Client · 群聊 / 私聊"/>
                     <Border Background="#131D34" BorderBrush="#253052" BorderThickness="1" CornerRadius="14" Padding="12">
                         <StackPanel Spacing="4">
                             <TextBlock FontSize="12" Foreground="#8FA1C7" Text="连接状态"/>
@@ -71,11 +74,11 @@
                     <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#8FA1C7" Text="我的群组"/>
                     <ListBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" Background="Transparent" BorderThickness="0">
                         <ListBox.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="model:ChatGroup">
                                 <Border Margin="0,0,0,8" Padding="14,12" CornerRadius="14" Background="#121A2E" BorderBrush="#22304D" BorderThickness="1">
                                     <StackPanel Spacing="4">
                                         <TextBlock FontWeight="SemiBold" Text="{Binding Name}"/>
-                                        <TextBlock FontSize="11" Foreground="#7C8DB5" Text="ID: {Binding Id}"/>
+                                        <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding Id, StringFormat='ID: {0}'}"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -91,9 +94,12 @@
                     <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding CurrentTitle}"/>
                     <TextBlock Foreground="#8B9ABA" Text="{Binding CurrentSubtitle}"/>
                 </StackPanel>
-                <Border Grid.Column="1" Background="#11192D" BorderBrush="#233150" BorderThickness="1" CornerRadius="999" Padding="12,6" VerticalAlignment="Center">
-                    <TextBlock FontSize="12" Foreground="#BFDBFE" Text="用户 #{Binding CurrentUserId}"/>
-                </Border>
+                <StackPanel Grid.Column="1" Spacing="8" HorizontalAlignment="Right">
+                    <Border Background="#11192D" BorderBrush="#233150" BorderThickness="1" CornerRadius="999" Padding="12,6" HorizontalAlignment="Right">
+                        <TextBlock FontSize="12" Foreground="#BFDBFE" Text="{Binding CurrentUserLabel}"/>
+                    </Border>
+                    <Button Classes="panelAction" Command="{Binding OpenGroupChatCommand}" IsVisible="{Binding IsDirectMode}">返回群聊</Button>
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -108,7 +114,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="0" HorizontalAlignment="Left" MaxWidth="520" Spacing="5" IsVisible="{Binding !IsSelf}">
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Left" MaxWidth="520" Spacing="5" IsVisible="{Binding IsOther}">
                                     <TextBlock FontSize="12" Foreground="#94A3B8" Text="{Binding SenderName}"/>
                                     <Border Classes="otherBubble" Padding="14,10">
                                         <TextBlock TextWrapping="Wrap" Text="{Binding Content}"/>
@@ -133,11 +139,13 @@
         <Border Grid.Row="2" Grid.Column="1" Background="#0D1426" BorderBrush="#1E293B" BorderThickness="0,1,0,0" Padding="18">
             <StackPanel Spacing="12">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Left" FontSize="12" Foreground="#7C8DB5" Text="Ctrl+Enter 发送 将在下一阶段补齐，当前点击按钮发送"/>
+                    <TextBlock DockPanel.Dock="Left" FontSize="12" Foreground="#7C8DB5" Text="{Binding InputHint}"/>
                     <Button DockPanel.Dock="Right" Classes="panelAction" Command="{Binding LoadMoreCommand}" IsEnabled="{Binding CanLoadMore}">加载历史</Button>
                 </DockPanel>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                    <TextBox Grid.Column="0"
+                    <TextBox Name="MessageInput"
+                             KeyDown="MessageInput_OnKeyDown"
+                             Grid.Column="0"
                              Text="{Binding MessageText, Mode=TwoWay}"
                              Watermark="输入消息..."
                              AcceptsReturn="True"
@@ -158,16 +166,20 @@
         <Border Grid.RowSpan="3" Grid.Column="2" Background="#0E1628" BorderBrush="#1E293B" BorderThickness="1,0,0,0" Padding="18">
             <StackPanel Spacing="12">
                 <TextBlock Classes="heading" Text="成员"/>
-                <TextBlock Foreground="#8FA1C7" Text="为第二阶段私聊功能预留"/>
+                <TextBlock Foreground="#8FA1C7" Text="点击成员可打开私聊"/>
                 <ItemsControl ItemsSource="{Binding Members}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Margin="0,0,0,8" Padding="12" CornerRadius="12" Background="#121A2E" BorderBrush="#22304D" BorderThickness="1">
-                                <StackPanel Spacing="3">
-                                    <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}"/>
-                                    <TextBlock FontSize="11" Foreground="#7C8DB5" Text="@{Binding Username}"/>
-                                </StackPanel>
-                            </Border>
+                        <DataTemplate x:DataType="model:GroupMember">
+                            <Button Classes="memberAction"
+                                    Command="{Binding #RootWindow.DataContext.OpenDirectChatCommand}"
+                                    CommandParameter="{Binding}">
+                                <Border Padding="12" Background="Transparent">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}"/>
+                                        <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding Username, StringFormat='@{0}'}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

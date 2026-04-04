@@ -28,6 +28,12 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     private ChatGroup? selectedGroup;
 
     [ObservableProperty]
+    private GroupMember? selectedPeer;
+
+    [ObservableProperty]
+    private ConversationMode conversationMode = ConversationMode.Group;
+
+    [ObservableProperty]
     private string messageText = string.Empty;
 
     [ObservableProperty]
@@ -48,20 +54,29 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     [ObservableProperty]
     private string currentSubtitle = "请选择一个群组开始聊天";
 
+    [ObservableProperty]
+    private string inputHint = "Ctrl+Enter 发送，Enter 换行";
+
     public long CurrentUserId => DefaultUserId;
-    public bool CanSend => !string.IsNullOrWhiteSpace(MessageText) && SelectedGroup is not null && ConnectionState == "Connected";
-    public bool CanLoadMore => SelectedGroup is not null && !IsLoadingHistory;
+    public string CurrentUserLabel => $"用户 #{CurrentUserId}";
+    public bool IsGroupMode => ConversationMode == ConversationMode.Group;
+    public bool IsDirectMode => ConversationMode == ConversationMode.Direct;
+    public bool CanSend => !string.IsNullOrWhiteSpace(MessageText) && ConnectionState == "Connected" && (SelectedGroup is not null || SelectedPeer is not null);
+    public bool CanLoadMore => !IsLoadingHistory && (SelectedGroup is not null || SelectedPeer is not null);
 
     public MainWindowViewModel()
     {
         _apiClient = new ApiClient(DefaultApiBase);
         _chatHubClient = new ChatHubClient(DefaultApiBase);
-        _chatHubClient.MessageReceived += OnMessageReceived;
+        _chatHubClient.GroupMessageReceived += OnGroupMessageReceived;
+        _chatHubClient.DirectMessageReceived += OnDirectMessageReceived;
         _chatHubClient.StateChanged += HandleConnectionStateChanged;
 
         SendCommand = new AsyncRelayCommand(SendAsync);
         LoadMoreCommand = new AsyncRelayCommand(LoadMoreAsync);
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
+        OpenGroupChatCommand = new AsyncRelayCommand(OpenGroupChatAsync);
+        OpenDirectChatCommand = new AsyncRelayCommand<GroupMember?>(OpenDirectChatAsync);
 
         _ = InitializeAsync();
     }
@@ -69,14 +84,28 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     public IAsyncRelayCommand SendCommand { get; }
     public IAsyncRelayCommand LoadMoreCommand { get; }
     public IAsyncRelayCommand RefreshCommand { get; }
+    public IAsyncRelayCommand OpenGroupChatCommand { get; }
+    public IAsyncRelayCommand<GroupMember?> OpenDirectChatCommand { get; }
 
     partial void OnSelectedGroupChanged(ChatGroup? value)
     {
         NotifyCanExecuteChanged();
-        if (value is not null)
+        if (value is not null && ConversationMode == ConversationMode.Group)
         {
             _ = SelectGroupAsync(value);
         }
+    }
+
+    partial void OnSelectedPeerChanged(GroupMember? value)
+    {
+        NotifyCanExecuteChanged();
+    }
+
+    partial void OnConversationModeChanged(ConversationMode value)
+    {
+        NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(IsGroupMode));
+        OnPropertyChanged(nameof(IsDirectMode));
     }
 
     partial void OnMessageTextChanged(string value)
@@ -99,13 +128,15 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         SendCommand.NotifyCanExecuteChanged();
         LoadMoreCommand.NotifyCanExecuteChanged();
         RefreshCommand.NotifyCanExecuteChanged();
+        OpenGroupChatCommand.NotifyCanExecuteChanged();
+        OpenDirectChatCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(CanSend));
         OnPropertyChanged(nameof(CanLoadMore));
     }
 
     private async Task SendAsync()
     {
-        if (!CanSend || SelectedGroup is null)
+        if (!CanSend)
         {
             return;
         }
@@ -113,20 +144,35 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         var content = MessageText.Trim();
         MessageText = string.Empty;
 
-        await _chatHubClient.SendMessageAsync(new SendMessageRequest
+        if (ConversationMode == ConversationMode.Group && SelectedGroup is not null)
         {
-            GroupId = SelectedGroup.Id,
-            SenderId = CurrentUserId,
-            Type = 1,
-            Content = content
-        });
+            await _chatHubClient.SendMessageAsync(new SendMessageRequest
+            {
+                GroupId = SelectedGroup.Id,
+                SenderId = CurrentUserId,
+                Type = 1,
+                Content = content
+            });
+            StatusText = "群消息已发送";
+            return;
+        }
 
-        StatusText = "消息已发送";
+        if (ConversationMode == ConversationMode.Direct && SelectedPeer is not null)
+        {
+            await _chatHubClient.SendDirectMessageAsync(new SendDirectMessageRequest
+            {
+                SenderId = CurrentUserId,
+                ReceiverId = SelectedPeer.UserId,
+                Type = 1,
+                Content = content
+            });
+            StatusText = "私聊消息已发送";
+        }
     }
 
     private async Task LoadMoreAsync()
     {
-        if (!CanLoadMore || SelectedGroup is null)
+        if (!CanLoadMore)
         {
             return;
         }
@@ -135,7 +181,21 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         try
         {
             var beforeId = Messages.FirstOrDefault()?.Id;
-            var older = (await _apiClient.GetMessagesAsync(SelectedGroup.Id, 30, beforeId)).Reverse().ToList();
+            List<ChatMessage> older;
+
+            if (ConversationMode == ConversationMode.Direct && SelectedPeer is not null)
+            {
+                older = (await _apiClient.GetDirectMessagesAsync(CurrentUserId, SelectedPeer.UserId, 30, beforeId)).Reverse().ToList();
+            }
+            else if (SelectedGroup is not null)
+            {
+                older = (await _apiClient.GetMessagesAsync(SelectedGroup.Id, 30, beforeId)).Reverse().ToList();
+            }
+            else
+            {
+                return;
+            }
+
             if (older.Count == 0)
             {
                 StatusText = "没有更多历史消息了";
@@ -148,7 +208,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
                 {
                     Messages.Insert(i, ChatMessageItemViewModel.FromMessage(older[i], CurrentUserId, Members));
                 }
-                CurrentSubtitle = $"{Members.Count} 位成员 · {Messages.Count} 条消息";
+                UpdateSubtitle();
             });
 
             StatusText = $"已加载 {older.Count} 条历史消息";
@@ -160,6 +220,41 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
     }
 
     private Task RefreshAsync() => InitializeAsync();
+
+    private async Task OpenGroupChatAsync()
+    {
+        if (SelectedGroup is null)
+        {
+            return;
+        }
+
+        ConversationMode = ConversationMode.Group;
+        SelectedPeer = null;
+        await SelectGroupAsync(SelectedGroup);
+    }
+
+    private async Task OpenDirectChatAsync(GroupMember? member)
+    {
+        if (member is null || member.UserId == CurrentUserId)
+        {
+            return;
+        }
+
+        ConversationMode = ConversationMode.Direct;
+        SelectedPeer = member;
+        Messages.Clear();
+        StatusText = $"正在打开与 {member.DisplayName} 的私聊…";
+
+        var messages = (await _apiClient.GetDirectMessagesAsync(CurrentUserId, member.UserId)).Reverse().ToList();
+        foreach (var message in messages)
+        {
+            Messages.Add(ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members));
+        }
+
+        CurrentTitle = member.DisplayName;
+        UpdateSubtitle();
+        StatusText = $"已打开与 {member.DisplayName} 的私聊";
+    }
 
     private async Task InitializeAsync()
     {
@@ -186,6 +281,8 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
             if (groups.Count > 0)
             {
                 SelectedGroup = groups[0];
+                ConversationMode = ConversationMode.Group;
+                await SelectGroupAsync(groups[0]);
             }
             else
             {
@@ -211,6 +308,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         {
             IsBusy = true;
             NotifyCanExecuteChanged();
+            ConversationMode = ConversationMode.Group;
             StatusText = $"正在进入 {group.Name}…";
 
             if (_joinedGroupId.HasValue && _joinedGroupId.Value != group.Id)
@@ -226,6 +324,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
+                SelectedPeer = null;
                 Members.Clear();
                 foreach (var member in members)
                 {
@@ -239,7 +338,7 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
                 }
 
                 CurrentTitle = group.Name;
-                CurrentSubtitle = $"{Members.Count} 位成员 · {Messages.Count} 条消息";
+                UpdateSubtitle();
             });
 
             StatusText = $"已进入 {group.Name}";
@@ -255,9 +354,18 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         }
     }
 
-    private void OnMessageReceived(ChatMessage message)
+    private void UpdateSubtitle()
     {
-        if (SelectedGroup?.Id != message.GroupId)
+        CurrentSubtitle = ConversationMode switch
+        {
+            ConversationMode.Direct when SelectedPeer is not null => $"私聊 · @{SelectedPeer.Username} · {Messages.Count} 条消息",
+            _ => $"{Members.Count} 位成员 · {Messages.Count} 条消息"
+        };
+    }
+
+    private void OnGroupMessageReceived(ChatMessage message)
+    {
+        if (ConversationMode != ConversationMode.Group || SelectedGroup?.Id != message.GroupId)
         {
             return;
         }
@@ -265,8 +373,29 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
         Dispatcher.UIThread.Post(() =>
         {
             Messages.Add(ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members));
-            CurrentSubtitle = $"{Members.Count} 位成员 · {Messages.Count} 条消息";
-            StatusText = "收到新消息";
+            UpdateSubtitle();
+            StatusText = "收到群消息";
+        });
+    }
+
+    private void OnDirectMessageReceived(ChatMessage message)
+    {
+        if (SelectedPeer is null)
+        {
+            return;
+        }
+
+        var peerId = message.SenderId == CurrentUserId ? message.ReceiverId : message.SenderId;
+        if (ConversationMode != ConversationMode.Direct || peerId != SelectedPeer.UserId)
+        {
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            Messages.Add(ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members));
+            UpdateSubtitle();
+            StatusText = "收到私聊消息";
         });
     }
 
@@ -289,7 +418,8 @@ public partial class MainWindowViewModel : ViewModelBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        _chatHubClient.MessageReceived -= OnMessageReceived;
+        _chatHubClient.GroupMessageReceived -= OnGroupMessageReceived;
+        _chatHubClient.DirectMessageReceived -= OnDirectMessageReceived;
         _chatHubClient.StateChanged -= HandleConnectionStateChanged;
         await _chatHubClient.DisposeAsync();
     }
@@ -303,11 +433,14 @@ public partial class ChatMessageItemViewModel : ObservableObject
     public string Content { get; init; } = string.Empty;
     public DateTime CreatedAt { get; init; }
     public bool IsSelf { get; init; }
+    public bool IsOther => !IsSelf;
     public string TimeText => CreatedAt.ToLocalTime().ToString("MM-dd HH:mm");
 
     public static ChatMessageItemViewModel FromMessage(ChatMessage message, long selfId, IEnumerable<GroupMember> members)
     {
-        var member = members.FirstOrDefault(x => x.UserId == message.SenderId);
+        var member = members.FirstOrDefault(x => x.UserId == message.SenderId)
+            ?? members.FirstOrDefault(x => x.UserId == message.ReceiverId);
+
         var senderName = message.SenderId == selfId
             ? "我"
             : member?.DisplayName ?? $"用户 {message.SenderId}";
@@ -323,3 +456,4 @@ public partial class ChatMessageItemViewModel : ObservableObject
         };
     }
 }
+

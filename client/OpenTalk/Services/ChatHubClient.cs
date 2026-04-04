@@ -17,7 +17,8 @@ public sealed class ChatHubClient : IAsyncDisposable
             .WithAutomaticReconnect()
             .Build();
 
-        _connection.On<ChatMessage>("ReceiveMessage", message => MessageReceived?.Invoke(message));
+        _connection.On<ChatMessage>("ReceiveMessage", message => GroupMessageReceived?.Invoke(message));
+        _connection.On<ChatMessage>("ReceiveDirectMessage", message => DirectMessageReceived?.Invoke(message));
         _connection.Reconnecting += _ =>
         {
             StateChanged?.Invoke("Reconnecting");
@@ -35,7 +36,8 @@ public sealed class ChatHubClient : IAsyncDisposable
         };
     }
 
-    public event Action<ChatMessage>? MessageReceived;
+    public event Action<ChatMessage>? GroupMessageReceived;
+    public event Action<ChatMessage>? DirectMessageReceived;
     public event Action<string>? StateChanged;
 
     public async Task StartAsync(long userId, CancellationToken cancellationToken = default)
@@ -54,6 +56,9 @@ public sealed class ChatHubClient : IAsyncDisposable
 
     public Task SendMessageAsync(SendMessageRequest request, CancellationToken cancellationToken = default)
         => _connection.InvokeAsync("SendMessage", request, cancellationToken);
+
+    public Task SendDirectMessageAsync(SendDirectMessageRequest request, CancellationToken cancellationToken = default)
+        => _connection.InvokeAsync("SendDirectMessage", request, cancellationToken);
 
     public async ValueTask DisposeAsync()
     {

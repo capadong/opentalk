@@ -38,4 +38,11 @@ public class ApiClient
         return await _httpClient.GetFromJsonAsync<List<ChatMessage>>($"api/v1/messages/{groupId}{query}", cancellationToken)
             ?? [];
     }
+
+    public async Task<IReadOnlyList<ChatMessage>> GetDirectMessagesAsync(long userId, long peerId, int limit = 50, long? beforeId = null, CancellationToken cancellationToken = default)
+    {
+        var query = beforeId.HasValue ? $"?limit={limit}&beforeId={beforeId.Value}" : $"?limit={limit}";
+        return await _httpClient.GetFromJsonAsync<List<ChatMessage>>($"api/v1/messages/direct/{userId}/{peerId}{query}", cancellationToken)
+            ?? [];
+    }
 }
