@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../client/OpenTalk/OpenTalk.csproj" Id="73899724-fa58-4973-b391-31308c36b374" />
   <Project Path="OpenTalk.Api/OpenTalk.Api.csproj" />
 </Solution>
