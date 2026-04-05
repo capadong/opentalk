@@ -60,6 +60,24 @@
             <Setter Property="BorderBrush" Value="#24314F"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
+        <Style Selector="TextBox.chatInput">
+            <Setter Property="Background" Value="#0B1222"/>
+            <Setter Property="BorderBrush" Value="#273554"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="CaretBrush" Value="#BFDBFE"/>
+            <Setter Property="SelectionBrush" Value="#2D6DF6"/>
+            <Setter Property="SelectionForegroundBrush" Value="#FFFFFF"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="TextBox.chatInput:pointerover">
+            <Setter Property="BorderBrush" Value="#36507A"/>
+        </Style>
+        <Style Selector="TextBox.chatInput:focus">
+            <Setter Property="BorderBrush" Value="#4F7DFF"/>
+        </Style>
     </Window.Styles>
 
     <Grid ColumnDefinitions="280,*,250" RowDefinitions="Auto,*,Auto">
@@ -112,7 +130,12 @@
         </Border>
 
         <Border Grid.Row="1" Grid.Column="1" Background="#0A0F1D">
-            <ScrollViewer Margin="0" Padding="22,18">
+            <ScrollViewer Name="ChatScroll"
+                          Margin="0"
+                          Padding="22,18"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          ScrollChanged="ChatScroll_OnScrollChanged">
                 <ItemsControl ItemsSource="{Binding Messages}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="vm:ChatMessageItemViewModel">
@@ -125,7 +148,24 @@
                                 <StackPanel Grid.Column="0" HorizontalAlignment="Left" MaxWidth="520" Spacing="5" IsVisible="{Binding IsOther}">
                                     <TextBlock FontSize="12" Foreground="#94A3B8" Text="{Binding SenderName}"/>
                                     <Border Classes="otherBubble" Padding="14,10">
-                                        <TextBlock TextWrapping="Wrap" Text="{Binding Content}"/>
+                                        <StackPanel Spacing="8">
+                                            <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
+
+                                            <Border IsVisible="{Binding IsImage}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                                <StackPanel Spacing="8">
+                                                    <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
+                                                    <TextBlock FontSize="11" Foreground="#93A7C8" Text="{Binding Content}"/>
+                                                    <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Border IsVisible="{Binding IsFile}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                                <StackPanel Spacing="6">
+                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
+                                                    <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
                                     </Border>
                                     <TextBlock FontSize="11" Foreground="#64748B" Text="{Binding TimeText}"/>
                                 </StackPanel>
@@ -133,7 +173,24 @@
                                 <StackPanel Grid.Column="1" HorizontalAlignment="Right" MaxWidth="520" Spacing="5" IsVisible="{Binding IsSelf}">
                                     <TextBlock FontSize="12" Foreground="#93C5FD" HorizontalAlignment="Right" Text="{Binding SenderName}"/>
                                     <Border Classes="selfBubble" Padding="14,10">
-                                        <TextBlock TextWrapping="Wrap" Text="{Binding Content}"/>
+                                        <StackPanel Spacing="8">
+                                            <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
+
+                                            <Border IsVisible="{Binding IsImage}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                                <StackPanel Spacing="8">
+                                                    <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
+                                                    <TextBlock FontSize="11" Foreground="#D6E4FF" Text="{Binding Content}"/>
+                                                    <TextBlock FontSize="11" Foreground="#C7D2FE" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Border IsVisible="{Binding IsFile}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                                <StackPanel Spacing="6">
+                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
+                                                    <TextBlock FontSize="11" Foreground="#C7D2FE" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
                                     </Border>
                                     <TextBlock FontSize="11" Foreground="#64748B" HorizontalAlignment="Right" Text="{Binding TimeText}"/>
                                 </StackPanel>
@@ -147,11 +204,11 @@
         <Border Grid.Row="2" Grid.Column="1" Background="#0D1426" BorderBrush="#1E293B" BorderThickness="0,1,0,0" Padding="18">
             <StackPanel Spacing="12">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Left" FontSize="12" Foreground="#7C8DB5" Text="{Binding InputHint}"/>
-                    <Button DockPanel.Dock="Right" Classes="panelAction" Command="{Binding LoadMoreCommand}" IsEnabled="{Binding CanLoadMore}">加载历史</Button>
+                    <TextBlock DockPanel.Dock="Right" FontSize="12" Foreground="#7C8DB5" Text="{Binding InputHint}" HorizontalAlignment="Right"/>
                 </DockPanel>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                     <TextBox Name="MessageInput"
+                             Classes="chatInput"
                              KeyDown="MessageInput_OnKeyDown"
                              Grid.Column="0"
                              Text="{Binding MessageText, Mode=TwoWay}"

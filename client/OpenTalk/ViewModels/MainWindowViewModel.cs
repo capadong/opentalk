@@ -58,6 +58,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string inputHint = "Ctrl+Enter 发送，Enter 换行";
 
+    // Used for "no-jump" history loading
+    [ObservableProperty]
+    private int pendingPrependedCount;
+
     public long CurrentUserId => DefaultUserId;
     public string CurrentUserLabel => $"用户 #{CurrentUserId}";
     public bool IsGroupMode => ConversationMode == ConversationMode.Group;
@@ -255,6 +259,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
+                PendingPrependedCount = older.Count;
                 for (var i = 0; i < older.Count; i++)
                 {
                     Messages.Insert(i, ChatMessageItemViewModel.FromMessage(older[i], CurrentUserId, Members));
@@ -371,10 +376,18 @@ public partial class MainWindowViewModel : ViewModelBase
             _joinedGroupId = group.Id;
 
             var members = await _apiClient.GetGroupMembersAsync(group.Id);
-            foreach (var member in members)
+            foreach (var member in members
+                         .Where(m => m.UserId != CurrentUserId)
+                         .GroupBy(m => m.UserId)
+                         .Select(g => g.First()))
             {
                 Members.Add(member);
             }
+
+            // Defensive: keep UI member list unique even if backend returns duplicates.
+            DeduplicateMembers();
+
+            UpdateSubtitle();
 
             var recent = (await _apiClient.GetMessagesAsync(group.Id, 50)).Reverse().ToList();
             foreach (var message in recent)
@@ -389,6 +402,24 @@ public partial class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             StatusText = $"进入群组失败：{ex.Message}";
+        }
+    }
+
+    private void DeduplicateMembers()
+    {
+        if (Members.Count <= 1)
+        {
+            return;
+        }
+
+        var seen = new HashSet<long>();
+        for (var i = Members.Count - 1; i >= 0; i--)
+        {
+            var id = Members[i].UserId;
+            if (!seen.Add(id))
+            {
+                Members.RemoveAt(i);
+            }
         }
     }
 

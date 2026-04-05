@@ -42,6 +42,12 @@ public sealed class ChatHubClient : IAsyncDisposable
 
     public async Task StartAsync(long userId, CancellationToken cancellationToken = default)
     {
+        if (_connection.State is HubConnectionState.Connected or HubConnectionState.Connecting or HubConnectionState.Reconnecting)
+        {
+            // Already started (or in-progress). Don't restart.
+            return;
+        }
+
         StateChanged?.Invoke("Connecting");
         await _connection.StartAsync(cancellationToken);
         await _connection.InvokeAsync("Register", userId, cancellationToken);

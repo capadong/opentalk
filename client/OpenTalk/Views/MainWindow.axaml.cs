@@ -1,6 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using OpenTalk.ViewModels;
 
 namespace OpenTalk.Views
@@ -10,6 +12,47 @@ namespace OpenTalk.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private async void ChatScroll_OnScrollChanged(object? sender, ScrollChangedEventArgs e)
+        {
+            if (DataContext is not MainWindowViewModel vm)
+            {
+                return;
+            }
+
+            // Near top => auto load history
+            // Avalonia doesn't provide Offset on ScrollChangedEventArgs in some versions,
+            // so we read current offset from the ScrollViewer itself.
+            var sv = sender as ScrollViewer;
+            if (sv is null)
+            {
+                return;
+            }
+
+            if (sv.Offset.Y <= 64 && vm.CanLoadMore)
+            {
+                // Capture current scroll metrics for "no-jump" adjustment.
+                var oldExtent = sv.Extent.Height;
+
+                await vm.LoadMoreCommand.ExecuteAsync(null);
+
+                // If we prepended items, compensate scroll so content doesn't jump.
+                if (vm.PendingPrependedCount > 0)
+                {
+                    // Let layout run once so Extent updates.
+                    await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+
+                    var newExtent = sv.Extent.Height;
+                    var delta = newExtent - oldExtent;
+                    if (delta > 0)
+                    {
+                        sv.Offset = new Vector(sv.Offset.X, sv.Offset.Y + delta);
+                    }
+
+                    vm.PendingPrependedCount = 0;
+                }
+            }
         }
 
         private async void MessageInput_OnKeyDown(object? sender, KeyEventArgs e)
