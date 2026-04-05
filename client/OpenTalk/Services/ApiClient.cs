@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
@@ -44,5 +45,18 @@ public class ApiClient
         var query = beforeId.HasValue ? $"?limit={limit}&beforeId={beforeId.Value}" : $"?limit={limit}";
         return await _httpClient.GetFromJsonAsync<List<ChatMessage>>($"api/v1/messages/direct/{userId}/{peerId}{query}", cancellationToken)
             ?? [];
+    }
+
+    public async Task<UploadFileResult?> UploadFileAsync(string filePath, long uploaderId, CancellationToken cancellationToken = default)
+    {
+        await using var fileStream = File.OpenRead(filePath);
+        using var content = new MultipartFormDataContent();
+        using var streamContent = new StreamContent(fileStream);
+        content.Add(streamContent, "file", Path.GetFileName(filePath));
+        content.Add(new StringContent(uploaderId.ToString()), "uploaderId");
+
+        using var response = await _httpClient.PostAsync("api/v1/files/upload", content, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<UploadFileResult>(cancellationToken: cancellationToken);
     }
 }

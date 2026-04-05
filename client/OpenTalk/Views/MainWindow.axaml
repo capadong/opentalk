@@ -42,6 +42,14 @@
         <Style Selector="Button.memberAction:pointerover">
             <Setter Property="Background" Value="#1A2540"/>
         </Style>
+        <Style Selector="Button.ghostAction">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#31405F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#D6E4FF"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="CornerRadius" Value="12"/>
+        </Style>
         <Style Selector="Border.selfBubble">
             <Setter Property="Background" Value="#2D6DF6"/>
             <Setter Property="CornerRadius" Value="18,18,6,18"/>
