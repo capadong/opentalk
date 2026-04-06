@@ -23,6 +23,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly string _imageCacheDir;
     private readonly Dictionary<string, string> _imageCache = new(StringComparer.OrdinalIgnoreCase);
     private bool _suppressConversationSelectionChanged;
+    private bool _noAvailableGroups;
+    private string _statusKey = "Main.InitializingStatus";
+    private object[] _statusArgs = [];
 
     public ObservableCollection<ChatGroup> Groups { get; } = [];
     public ObservableCollection<ConversationListEntry> Conversations { get; } = [];
@@ -54,23 +57,24 @@ public partial class MainWindowViewModel : ViewModelBase
     private bool isLoadingHistory;
 
     [ObservableProperty]
-    private string statusText = "正在连接服务…";
+    private string statusText = LocalizationService.Instance.GetString("Main.InitializingStatus");
 
     [ObservableProperty]
-    private string currentTitle = "OpenTalk";
+    private string currentTitle = LocalizationService.Instance.GetString("App.Name");
 
     [ObservableProperty]
-    private string currentSubtitle = "请选择一个群组开始聊天";
+    private string currentSubtitle = LocalizationService.Instance.GetString("Main.SelectGroupPrompt");
 
     [ObservableProperty]
-    private string inputHint = "Ctrl+Enter 发送，Enter 换行";
+    private string inputHint = LocalizationService.Instance.GetString("Main.InputHint");
 
     // Used for "no-jump" history loading
     [ObservableProperty]
     private int pendingPrependedCount;
 
     public long CurrentUserId => DefaultUserId;
-    public string CurrentUserLabel => $"用户 #{CurrentUserId}";
+    public string CurrentUserLabel => LocalizationService.Instance.Format("Main.UserLabel", CurrentUserId);
+    public string ConnectionStateLabel => GetConnectionStateLabel(ConnectionState);
     public bool IsGroupMode => ConversationMode == ConversationMode.Group;
     public bool IsDirectMode => ConversationMode == ConversationMode.Direct;
     public bool CanSend => !string.IsNullOrWhiteSpace(MessageText) && ConnectionState == "Connected" && (SelectedGroup is not null || SelectedPeer is not null);
@@ -84,6 +88,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _chatHubClient.GroupMessageReceived += OnGroupMessageReceived;
         _chatHubClient.DirectMessageReceived += OnDirectMessageReceived;
         _chatHubClient.StateChanged += HandleConnectionStateChanged;
+        LocalizationService.Instance.LanguageChanged += LocalizationService_LanguageChanged;
 
         SendCommand = new AsyncRelayCommand(SendAsync);
         LoadMoreCommand = new AsyncRelayCommand(LoadMoreAsync);
@@ -91,6 +96,7 @@ public partial class MainWindowViewModel : ViewModelBase
         OpenGroupChatCommand = new AsyncRelayCommand(OpenGroupChatAsync);
         OpenDirectChatCommand = new AsyncRelayCommand<GroupMember?>(OpenDirectChatAsync);
 
+        RefreshLocalizedContent();
         _ = InitializeAsync();
     }
 
@@ -156,6 +162,7 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnConnectionStateChanged(string value)
     {
         NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(ConnectionStateLabel));
     }
 
     partial void OnIsLoadingHistoryChanged(bool value)
@@ -193,7 +200,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 Type = 1,
                 Content = content
             });
-            StatusText = "群消息已发送";
+            SetStatus("Main.GroupMessageSent");
             return;
         }
 
@@ -206,7 +213,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 Type = 1,
                 Content = content
             });
-            StatusText = "私聊消息已发送";
+            SetStatus("Main.DirectMessageSent");
         }
     }
 
@@ -217,11 +224,11 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        StatusText = $"正在上传 {Path.GetFileName(filePath)}…";
+        SetStatus("Main.Uploading", Path.GetFileName(filePath));
         var upload = await _apiClient.UploadFileAsync(filePath, CurrentUserId);
         if (upload is null)
         {
-            StatusText = "上传失败";
+            SetStatus("Main.UploadFailed");
             return;
         }
 
@@ -236,7 +243,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 Content = upload.Name,
                 FileUrl = upload.Url
             });
-            StatusText = messageType == 2 ? "图片已发送" : "文件已发送";
+            SetStatus(messageType == 2 ? "Main.ImageSent" : "Main.FileSent");
             return;
         }
 
@@ -250,7 +257,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 Content = upload.Name,
                 FileUrl = upload.Url
             });
-            StatusText = messageType == 2 ? "图片已发送" : "文件已发送";
+            SetStatus(messageType == 2 ? "Main.ImageSent" : "Main.FileSent");
         }
     }
 
@@ -288,7 +295,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             if (older.Count == 0)
             {
-                StatusText = "没有更多历史消息了";
+                SetStatus("Main.NoMoreHistory");
                 return;
             }
 
@@ -308,7 +315,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 UpdateSubtitle();
             });
 
-            StatusText = $"已加载 {older.Count} 条历史消息";
+            SetStatus("Main.HistoryLoaded", older.Count);
         }
         finally
         {
@@ -341,7 +348,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ConversationMode = ConversationMode.Direct;
         SelectedPeer = member;
         Messages.Clear();
-        StatusText = $"正在打开与 {member.DisplayName} 的私聊…";
+        SetStatus("Main.OpeningDirectChat", member.DisplayName);
         EnsurePeerConversation(member);
         SelectConversationByPeerId(member.UserId);
 
@@ -353,7 +360,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         CurrentTitle = member.DisplayName;
         UpdateSubtitle();
-        StatusText = $"已打开与 {member.DisplayName} 的私聊";
+        SetStatus("Main.OpenedDirectChat", member.DisplayName);
     }
 
     private async Task InitializeAsync()
@@ -382,6 +389,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             if (groups.Count > 0)
             {
+                _noAvailableGroups = false;
                 SelectedGroup = groups[0];
                 ConversationMode = ConversationMode.Group;
                 SelectConversationByGroupId(groups[0].Id);
@@ -389,14 +397,15 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             else
             {
-                CurrentSubtitle = "当前账号没有可用群组";
-                StatusText = "请先在服务端创建群组";
+                _noAvailableGroups = true;
+                CurrentSubtitle = LocalizationService.Instance.GetString("Main.NoGroupsSubtitle");
+                SetStatus("Main.NoGroupsStatus");
             }
         }
         catch (Exception ex)
         {
             ConnectionState = "Disconnected";
-            StatusText = $"初始化失败：{ex.Message}";
+            SetStatus("Main.InitializationFailed", ex.Message);
         }
         finally
         {
@@ -412,7 +421,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         try
         {
-            StatusText = $"正在进入群组：{group.Name}…";
+            SetStatus("Main.EnteringGroup", group.Name);
 
             if (_joinedGroupId.HasValue && _joinedGroupId.Value != group.Id)
             {
@@ -446,11 +455,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
             CurrentTitle = group.Name;
             UpdateSubtitle();
-            StatusText = $"已进入群组：{group.Name}";
+            SetStatus("Main.EnteredGroup", group.Name);
         }
         catch (Exception ex)
         {
-            StatusText = $"进入群组失败：{ex.Message}";
+            SetStatus("Main.EnterGroupFailed", ex.Message);
         }
     }
 
@@ -486,8 +495,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var memberCount = Members.Count;
         CurrentSubtitle = ConversationMode == ConversationMode.Group
-            ? $"{memberCount} 位成员 · {Messages.Count} 条消息"
-            : $"{Messages.Count} 条消息";
+            ? LocalizationService.Instance.Format("Main.GroupSubtitle", memberCount, Messages.Count)
+            : LocalizationService.Instance.Format("Main.DirectSubtitle", Messages.Count);
     }
 
     private void HandleConnectionStateChanged(string state)
@@ -495,14 +504,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Dispatcher.UIThread.Post(() =>
         {
             ConnectionState = state;
-            StatusText = state switch
-            {
-                "Connected" => "已连接",
-                "Connecting" => "正在连接…",
-                "Reconnecting" => "正在重连…",
-                "Disconnected" => "已断开",
-                _ => $"连接状态：{state}"
-            };
+            SetStatus(GetConnectionStatusKey(state), state);
         });
     }
 
@@ -588,8 +590,11 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private void RebuildConversations()
+    private void RebuildConversations(bool preserveSelection = false)
     {
+        var selectedGroupId = preserveSelection ? SelectedGroup?.Id : null;
+        var selectedPeerId = preserveSelection ? SelectedPeer?.UserId : null;
+
         Conversations.Clear();
 
         foreach (var group in Groups)
@@ -604,6 +609,15 @@ public partial class MainWindowViewModel : ViewModelBase
                      .OrderBy(m => m.DisplayName, StringComparer.OrdinalIgnoreCase))
         {
             Conversations.Add(ConversationListEntry.FromMember(member));
+        }
+
+        if (selectedGroupId.HasValue)
+        {
+            SelectConversationByGroupId(selectedGroupId.Value);
+        }
+        else if (selectedPeerId.HasValue)
+        {
+            SelectConversationByPeerId(selectedPeerId.Value);
         }
     }
 
@@ -645,7 +659,9 @@ public partial class MainWindowViewModel : ViewModelBase
         public string Subtitle { get; init; } = string.Empty;
         public DateTime SortTime { get; init; }
         public GroupMember? Member { get; init; }
-        public string AvatarText => IsGroup ? "群" : "人";
+        public string AvatarText => IsGroup
+            ? LocalizationService.Instance.GetString("Main.ConversationAvatarGroup")
+            : LocalizationService.Instance.GetString("Main.ConversationAvatarPerson");
         public string TimeText => SortTime == default ? string.Empty : SortTime.ToString("MM/dd");
 
         public static ConversationListEntry FromGroup(ChatGroup group)
@@ -655,7 +671,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 IsGroup = true,
                 GroupId = group.Id,
                 Title = group.Name,
-                Subtitle = $"群聊 #{group.Id}",
+                Subtitle = LocalizationService.Instance.Format("Main.ConversationGroupSubtitle", group.Id),
                 SortTime = group.CreatedAt
             };
         }
@@ -672,5 +688,66 @@ public partial class MainWindowViewModel : ViewModelBase
                 Member = member
             };
         }
+    }
+
+    private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
+    {
+        Dispatcher.UIThread.Post(RefreshLocalizedContent);
+    }
+
+    private void RefreshLocalizedContent()
+    {
+        InputHint = LocalizationService.Instance.GetString("Main.InputHint");
+        CurrentTitle = SelectedPeer?.DisplayName ?? SelectedGroup?.Name ?? LocalizationService.Instance.GetString("App.Name");
+        CurrentSubtitle = SelectedPeer is not null || SelectedGroup is not null
+            ? CurrentSubtitle
+            : LocalizationService.Instance.GetString(_noAvailableGroups ? "Main.NoGroupsSubtitle" : "Main.SelectGroupPrompt");
+
+        OnPropertyChanged(nameof(CurrentUserLabel));
+        OnPropertyChanged(nameof(ConnectionStateLabel));
+        RebuildConversations(preserveSelection: true);
+
+        if (SelectedPeer is not null || SelectedGroup is not null)
+        {
+            UpdateSubtitle();
+        }
+
+        ApplyStatusText();
+    }
+
+    private void SetStatus(string key, params object[] args)
+    {
+        _statusKey = key;
+        _statusArgs = args;
+        ApplyStatusText();
+    }
+
+    private void ApplyStatusText()
+    {
+        StatusText = LocalizationService.Instance.Format(_statusKey, _statusArgs);
+    }
+
+    private static string GetConnectionStatusKey(string state)
+    {
+        return state switch
+        {
+            "Connected" => "Main.Connection.Connected",
+            "Connecting" => "Main.Connection.Connecting",
+            "Reconnecting" => "Main.Connection.Reconnecting",
+            "Disconnected" => "Main.Connection.Disconnected",
+            _ => "Main.Connection.Other",
+        };
+    }
+
+    private static string GetConnectionStateLabel(string state)
+    {
+        return state switch
+        {
+            "Connected" => LocalizationService.Instance.GetString("Main.Connection.Connected"),
+            "Connecting" => LocalizationService.Instance.GetString("Main.Connection.Connecting"),
+            "Reconnecting" => LocalizationService.Instance.GetString("Main.Connection.Reconnecting"),
+            "Disconnected" => LocalizationService.Instance.GetString("Main.Connection.Disconnected"),
+            _ => LocalizationService.Instance.Format("Main.Connection.Other", state),
+        };
     }
 }

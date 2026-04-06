@@ -8,6 +8,7 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using OpenTalk.Services;
 using OpenTalk.ViewModels;
 
 namespace OpenTalk.Views
@@ -87,7 +88,7 @@ namespace OpenTalk.Views
 
             var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "选择图片或文件",
+                Title = LocalizationService.Instance.GetString("Main.SelectFileTitle"),
                 AllowMultiple = false
             });
 

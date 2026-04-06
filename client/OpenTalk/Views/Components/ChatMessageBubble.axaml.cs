@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using OpenTalk.Services;
 using OpenTalk.ViewModels;
 using System;
 
@@ -103,7 +104,7 @@ public partial class ChatMessageBubble : UserControl
             MinHeight = 480,
             Background = Brushes.Black,
             Content = root,
-            Title = string.IsNullOrWhiteSpace(title) ? "图片预览" : title,
+            Title = string.IsNullOrWhiteSpace(title) ? LocalizationService.Instance.GetString("Common.ImagePreview") : title,
             WindowStartupLocation = owner is null ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner
         };
 

@@ -1,7 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:OpenTalk.ViewModels"
-        xmlns:svc="using:OpenTalk.Services"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -12,7 +11,7 @@
         MinWidth="480"
         MinHeight="320"
         Icon="/Assets/avalonia-logo.ico"
-        Title="设置 · OpenTalk">
+        Title="{DynamicResource Settings.WindowTitle}">
 
     <Window.Styles>
         <Style Selector="TextBlock.h1">
@@ -38,31 +37,50 @@
     <Border Padding="20">
         <Grid RowDefinitions="Auto,*,Auto" RowSpacing="14">
             <StackPanel Spacing="6">
-                <TextBlock Classes="h1" Text="设置"/>
-                <TextBlock Classes="caption" Text="在这里切换主题样式（立即生效）"/>
+                <TextBlock Classes="h1" Text="{DynamicResource Settings.Header}"/>
+                <TextBlock Classes="caption" Text="{DynamicResource Settings.Description}"/>
             </StackPanel>
 
             <Border Grid.Row="1" Classes="card" Padding="16">
-                <StackPanel Spacing="10">
-                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="主题"/>
+                <StackPanel Spacing="14">
+                    <StackPanel Spacing="10">
+                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{DynamicResource Settings.Theme}"/>
 
-                    <ComboBox ItemsSource="{Binding AvailableThemes}"
-                              SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
-                              HorizontalAlignment="Left"
-                              MinWidth="220">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate x:DataType="svc:AppTheme">
-                                <TextBlock Text="{Binding}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                        <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                  SelectedItem="{Binding SelectedThemeOption, Mode=TwoWay}"
+                                  HorizontalAlignment="Left"
+                                  MinWidth="220">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsWindowViewModel+ThemeOption">
+                                    <TextBlock Text="{Binding Label}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
-					<TextBlock Classes="caption" Text="{Binding ThemeLabel, StringFormat='当前选择：{0}'}" />
+                        <TextBlock Classes="caption" Text="{Binding ThemeLabel}" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="10">
+                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{DynamicResource Settings.Language}"/>
+
+                        <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                  SelectedItem="{Binding SelectedLanguageOption, Mode=TwoWay}"
+                                  HorizontalAlignment="Left"
+                                  MinWidth="220">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingsWindowViewModel+LanguageOption">
+                                    <TextBlock Text="{Binding Label}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Classes="caption" Text="{Binding LanguageLabel}" />
+                    </StackPanel>
                 </StackPanel>
             </Border>
 
             <DockPanel Grid.Row="2" LastChildFill="False">
-                <Button Classes="primary" Content="应用" Command="{Binding ApplyThemeCommand}" HorizontalAlignment="Right"/>
+                <Button Classes="primary" Content="{DynamicResource Settings.Apply}" Command="{Binding ApplySettingsCommand}" HorizontalAlignment="Right"/>
             </DockPanel>
         </Grid>
     </Border>

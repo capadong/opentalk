@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using OpenTalk.Services;
 using OpenTalk.ViewModels;
 using OpenTalk.Views;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace OpenTalk
 
         public override void OnFrameworkInitializationCompleted()
         {
+            LocalizationService.Instance.Apply(LocalizationService.Instance.CurrentLanguage);
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 

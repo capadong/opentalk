@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /web/opentalk-web/dist
 /server/OpenTalk.Api/wwwroot/uploads/
+/client/OpenTalk/build-verify

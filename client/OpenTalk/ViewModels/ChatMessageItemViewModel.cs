@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using OpenTalk.Models;
+using OpenTalk.Services;
 
 namespace OpenTalk.ViewModels;
 
@@ -73,7 +74,7 @@ public sealed class ChatMessageItemViewModel
             ? null
             : System.Linq.Enumerable.FirstOrDefault(members, m => m.UserId == message.SenderId);
 
-        var label = member?.DisplayName ?? $"用户 #{message.SenderId}";
+        var label = member?.DisplayName ?? LocalizationService.Instance.Format("Main.UserLabel", message.SenderId);
 
         return new ChatMessageItemViewModel
         {
