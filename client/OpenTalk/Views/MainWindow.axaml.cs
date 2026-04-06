@@ -85,5 +85,15 @@ namespace OpenTalk.Views
 
             await vm.SendPickedFileAsync(file.Path.LocalPath);
         }
+
+        private void OpenSettings_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            var w = new SettingsWindow
+            {
+                DataContext = new SettingsWindowViewModel(),
+            };
+
+            w.Show();
+        }
     }
 }

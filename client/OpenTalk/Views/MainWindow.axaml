@@ -12,8 +12,8 @@
         Height="820"
         MinWidth="1080"
         MinHeight="720"
-        Background="#0B1020"
-        Foreground="#E5E7EB"
+        Background="{DynamicResource OT.WindowBgBrush}"
+        Foreground="{DynamicResource OT.TextBrush}"
         Icon="/Assets/avalonia-logo.ico"
         Title="OpenTalk">
 
@@ -23,88 +23,88 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
         <Style Selector="Button.panelAction">
-            <Setter Property="Background" Value="#18213A"/>
-            <Setter Property="BorderBrush" Value="#253052"/>
+            <Setter Property="Background" Value="{DynamicResource OT.ButtonBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OT.ButtonBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="Padding" Value="14,8"/>
             <Setter Property="CornerRadius" Value="12"/>
         </Style>
         <Style Selector="Button.memberAction">
-            <Setter Property="Background" Value="#121A2E"/>
-            <Setter Property="BorderBrush" Value="#22304D"/>
+            <Setter Property="Background" Value="{DynamicResource OT.CardBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OT.CardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#E5E7EB"/>
+            <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
         <Style Selector="Button.memberAction:pointerover">
-            <Setter Property="Background" Value="#1A2540"/>
+            <Setter Property="Background" Value="{DynamicResource OT.CardHoverBgBrush}"/>
         </Style>
         <Style Selector="Button.ghostAction">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="#31405F"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OT.GhostBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#D6E4FF"/>
+            <Setter Property="Foreground" Value="{DynamicResource OT.GhostTextBrush}"/>
             <Setter Property="Padding" Value="12,8"/>
             <Setter Property="CornerRadius" Value="12"/>
         </Style>
         <Style Selector="Border.selfBubble">
-            <Setter Property="Background" Value="#2D6DF6"/>
+            <Setter Property="Background" Value="{DynamicResource OT.SelfBubbleBgBrush}"/>
             <Setter Property="CornerRadius" Value="18,18,6,18"/>
         </Style>
         <Style Selector="Border.otherBubble">
-            <Setter Property="Background" Value="#141C31"/>
+            <Setter Property="Background" Value="{DynamicResource OT.OtherBubbleBgBrush}"/>
             <Setter Property="CornerRadius" Value="18,18,18,6"/>
-            <Setter Property="BorderBrush" Value="#24314F"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OT.OtherBubbleBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
         <Style Selector="TextBox.chatInput">
-            <Setter Property="Background" Value="#0B1222"/>
-            <Setter Property="BorderBrush" Value="#273554"/>
+            <Setter Property="Background" Value="{DynamicResource OT.InputBgBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Foreground" Value="#E5E7EB"/>
-            <Setter Property="CaretBrush" Value="#BFDBFE"/>
-            <Setter Property="SelectionBrush" Value="#2D6DF6"/>
+            <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource OT.AccentTextBrush}"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource OT.SelectionBrush}"/>
             <Setter Property="SelectionForegroundBrush" Value="#FFFFFF"/>
             <Setter Property="Padding" Value="14,12"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
         <Style Selector="TextBox.chatInput:pointerover">
-            <Setter Property="BorderBrush" Value="#36507A"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderHoverBrush}"/>
         </Style>
         <Style Selector="TextBox.chatInput:focus">
-            <Setter Property="BorderBrush" Value="#4F7DFF"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderFocusBrush}"/>
         </Style>
     </Window.Styles>
 
     <Grid ColumnDefinitions="280,*,250" RowDefinitions="Auto,*,Auto">
-        <Border Grid.RowSpan="3" Background="#0F172A" BorderBrush="#1E293B" BorderThickness="0,0,1,0" Padding="18">
+        <Border Grid.RowSpan="3" Background="{DynamicResource OT.SidebarBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="0,0,1,0" Padding="18">
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Top" Spacing="10">
                     <TextBlock Classes="heading" Text="OpenTalk"/>
-                    <TextBlock Foreground="#94A3B8" Text="Avalonia Client · 群聊 / 私聊"/>
-                    <Border Background="#131D34" BorderBrush="#253052" BorderThickness="1" CornerRadius="14" Padding="12">
+                    <TextBlock Foreground="{DynamicResource OT.TextMutedBrush}" Text="Avalonia Client · 群聊 / 私聊"/>
+                    <Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.BorderStrongBrush}" BorderThickness="1" CornerRadius="14" Padding="12">
                         <StackPanel Spacing="4">
-                            <TextBlock FontSize="12" Foreground="#8FA1C7" Text="连接状态"/>
+                            <TextBlock FontSize="12" Foreground="{DynamicResource OT.TextMutedBrush}" Text="连接状态"/>
                             <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding ConnectionState}"/>
-                            <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding StatusText}" TextWrapping="Wrap"/>
+                            <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding StatusText}" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
                     <Button Classes="panelAction" Command="{Binding RefreshCommand}">刷新群组</Button>
                 </StackPanel>
 
                 <StackPanel Margin="0,18,0,0" Spacing="10">
-                    <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#8FA1C7" Text="我的群组"/>
+                    <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource OT.TextMutedBrush}" Text="我的群组"/>
                     <ListBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" Background="Transparent" BorderThickness="0">
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="model:ChatGroup">
-                                <Border Margin="0,0,0,8" Padding="14,12" CornerRadius="14" Background="#121A2E" BorderBrush="#22304D" BorderThickness="1">
+                                <Border Margin="0,0,0,8" Padding="14,12" CornerRadius="14" Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.CardBorderBrush}" BorderThickness="1">
                                     <StackPanel Spacing="4">
                                         <TextBlock FontWeight="SemiBold" Text="{Binding Name}"/>
-                                        <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding Id, StringFormat='ID: {0}'}"/>
+                                        <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding Id, StringFormat='ID: {0}'}"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -114,22 +114,25 @@
             </DockPanel>
         </Border>
 
-        <Border Grid.Column="1" Background="#0B1020" BorderBrush="#1E293B" BorderThickness="0,0,0,1" Padding="22,18">
+        <Border Grid.Column="1" Background="{DynamicResource OT.TopbarBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="0,0,0,1" Padding="22,18">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Spacing="4">
                     <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding CurrentTitle}"/>
-                    <TextBlock Foreground="#8B9ABA" Text="{Binding CurrentSubtitle}"/>
+                    <TextBlock Foreground="{DynamicResource OT.TextMutedBrush}" Text="{Binding CurrentSubtitle}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Spacing="8" HorizontalAlignment="Right">
-                    <Border Background="#11192D" BorderBrush="#233150" BorderThickness="1" CornerRadius="999" Padding="12,6" HorizontalAlignment="Right">
-                        <TextBlock FontSize="12" Foreground="#BFDBFE" Text="{Binding CurrentUserLabel}"/>
+                    <Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.BorderStrongBrush}" BorderThickness="1" CornerRadius="999" Padding="12,6" HorizontalAlignment="Right">
+                        <TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" Text="{Binding CurrentUserLabel}"/>
                     </Border>
-                    <Button Classes="panelAction" Command="{Binding OpenGroupChatCommand}" IsVisible="{Binding IsDirectMode}">返回群聊</Button>
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                        <Button Classes="ghostAction" Click="OpenSettings_OnClick">设置</Button>
+                        <Button Classes="panelAction" Command="{Binding OpenGroupChatCommand}" IsVisible="{Binding IsDirectMode}">返回群聊</Button>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Grid.Column="1" Background="#0A0F1D">
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource OT.ChatAreaBgBrush}">
             <ScrollViewer Name="ChatScroll"
                           Margin="0"
                           Padding="22,18"
@@ -146,37 +149,37 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" HorizontalAlignment="Left" MaxWidth="520" Spacing="5" IsVisible="{Binding IsOther}">
-                                    <TextBlock FontSize="12" Foreground="#94A3B8" Text="{Binding SenderName}"/>
+                                    <TextBlock FontSize="12" Foreground="{DynamicResource OT.TextMutedBrush}" Text="{Binding SenderName}"/>
                                     <Border Classes="otherBubble" Padding="14,10">
                                         <StackPanel Spacing="8">
                                             <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
 
-                                            <Border IsVisible="{Binding IsImage}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                            <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
                                                 <StackPanel Spacing="8">
                                                     <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
-                                                    <TextBlock FontSize="11" Foreground="#93A7C8" Text="{Binding Content}"/>
-                                                    <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextMutedBrush}" Text="{Binding Content}"/>
+                                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
                                                 </StackPanel>
                                             </Border>
 
-                                            <Border IsVisible="{Binding IsFile}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                            <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
                                                 <StackPanel Spacing="6">
                                                     <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
-                                                    <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
                                                 </StackPanel>
                                             </Border>
                                         </StackPanel>
                                     </Border>
-                                    <TextBlock FontSize="11" Foreground="#64748B" Text="{Binding TimeText}"/>
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding TimeText}"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1" HorizontalAlignment="Right" MaxWidth="520" Spacing="5" IsVisible="{Binding IsSelf}">
-                                    <TextBlock FontSize="12" Foreground="#93C5FD" HorizontalAlignment="Right" Text="{Binding SenderName}"/>
+                                    <TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" HorizontalAlignment="Right" Text="{Binding SenderName}"/>
                                     <Border Classes="selfBubble" Padding="14,10">
                                         <StackPanel Spacing="8">
                                             <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
 
-                                            <Border IsVisible="{Binding IsImage}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                            <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
                                                 <StackPanel Spacing="8">
                                                     <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
                                                     <TextBlock FontSize="11" Foreground="#D6E4FF" Text="{Binding Content}"/>
@@ -184,7 +187,7 @@
                                                 </StackPanel>
                                             </Border>
 
-                                            <Border IsVisible="{Binding IsFile}" Background="#0B1222" BorderBrush="#273554" BorderThickness="1" CornerRadius="12" Padding="10">
+                                            <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
                                                 <StackPanel Spacing="6">
                                                     <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
                                                     <TextBlock FontSize="11" Foreground="#C7D2FE" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
@@ -192,7 +195,7 @@
                                             </Border>
                                         </StackPanel>
                                     </Border>
-                                    <TextBlock FontSize="11" Foreground="#64748B" HorizontalAlignment="Right" Text="{Binding TimeText}"/>
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" HorizontalAlignment="Right" Text="{Binding TimeText}"/>
                                 </StackPanel>
                             </Grid>
                         </DataTemplate>
@@ -201,10 +204,10 @@
             </ScrollViewer>
         </Border>
 
-        <Border Grid.Row="2" Grid.Column="1" Background="#0D1426" BorderBrush="#1E293B" BorderThickness="0,1,0,0" Padding="18">
+        <Border Grid.Row="2" Grid.Column="1" Background="{DynamicResource OT.InputBarBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="0,1,0,0" Padding="18">
             <StackPanel Spacing="12">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Right" FontSize="12" Foreground="#7C8DB5" Text="{Binding InputHint}" HorizontalAlignment="Right"/>
+                    <TextBlock DockPanel.Dock="Right" FontSize="12" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding InputHint}" HorizontalAlignment="Right"/>
                 </DockPanel>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                     <TextBox Name="MessageInput"
@@ -228,10 +231,10 @@
             </StackPanel>
         </Border>
 
-        <Border Grid.RowSpan="3" Grid.Column="2" Background="#0E1628" BorderBrush="#1E293B" BorderThickness="1,0,0,0" Padding="18">
+        <Border Grid.RowSpan="3" Grid.Column="2" Background="{DynamicResource OT.RightPanelBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="1,0,0,0" Padding="18">
             <StackPanel Spacing="12">
                 <TextBlock Classes="heading" Text="成员"/>
-                <TextBlock Foreground="#8FA1C7" Text="点击成员可打开私聊"/>
+                <TextBlock Foreground="{DynamicResource OT.TextMutedBrush}" Text="点击成员可打开私聊"/>
                 <ItemsControl ItemsSource="{Binding Members}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="model:GroupMember">
@@ -241,7 +244,7 @@
                                 <Border Padding="12" Background="Transparent">
                                     <StackPanel Spacing="3">
                                         <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}"/>
-                                        <TextBlock FontSize="11" Foreground="#7C8DB5" Text="{Binding Username, StringFormat='@{0}'}"/>
+                                        <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding Username, StringFormat='@{0}'}"/>
                                     </StackPanel>
                                 </Border>
                             </Button>

@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:OpenTalk.ViewModels"
+        xmlns:svc="using:OpenTalk.Services"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="OpenTalk.Views.SettingsWindow"
+        x:DataType="vm:SettingsWindowViewModel"
+        Width="520"
+        Height="360"
+        MinWidth="480"
+        MinHeight="320"
+        Title="设置 · OpenTalk">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.h1">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="TextBlock.caption">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundLowBrush}"/>
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="14,10"/>
+        </Style>
+        <Style Selector="Border.card">
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ThemeControlLowBrush}"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Padding="20">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="14">
+            <StackPanel Spacing="6">
+                <TextBlock Classes="h1" Text="设置"/>
+                <TextBlock Classes="caption" Text="在这里切换主题样式（立即生效）"/>
+            </StackPanel>
+
+            <Border Grid.Row="1" Classes="card" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="主题"/>
+
+                    <ComboBox ItemsSource="{Binding AvailableThemes}"
+                              SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                              HorizontalAlignment="Left"
+                              MinWidth="220">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="svc:AppTheme">
+                                <TextBlock Text="{Binding}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Classes="caption" Text="当前选择：{Binding ThemeLabel}"/>
+                </StackPanel>
+            </Border>
+
+            <DockPanel Grid.Row="2" LastChildFill="False">
+                <Button Classes="primary" Content="应用" Command="{Binding ApplyThemeCommand}" HorizontalAlignment="Right"/>
+            </DockPanel>
+        </Grid>
+    </Border>
+</Window>
