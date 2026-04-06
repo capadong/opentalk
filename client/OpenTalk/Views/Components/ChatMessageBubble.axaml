@@ -17,9 +17,8 @@
 
                     <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
                         <StackPanel Spacing="6">
-                            <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
+                            <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260" Cursor="Hand" PointerPressed="ImagePreview_OnPointerPressed"/>
                             <TextBlock FontSize="11" Classes="wxMutedText" Text="{Binding Content}" TextWrapping="WrapWithOverflow"/>
-                            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding FileUrl}" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
 
@@ -42,9 +41,8 @@
 
                     <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
                         <StackPanel Spacing="6">
-                            <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
+                            <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260" Cursor="Hand" PointerPressed="ImagePreview_OnPointerPressed"/>
                             <TextBlock FontSize="11" Foreground="#EAFCE8" Text="{Binding Content}" TextWrapping="WrapWithOverflow"/>
-                            <TextBlock FontSize="11" Foreground="#D6F8D2" Text="{Binding FileUrl}" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
 

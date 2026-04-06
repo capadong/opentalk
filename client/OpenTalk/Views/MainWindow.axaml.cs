@@ -3,7 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using System;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using OpenTalk.ViewModels;
 
 namespace OpenTalk.Views
@@ -118,14 +120,21 @@ namespace OpenTalk.Views
 
             if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Reset)
             {
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    if (this.FindControl<ScrollViewer>("ChatScroll") is { } sv)
-                    {
-                        sv.Offset = new Vector(sv.Offset.X, sv.Extent.Height);
-                    }
-                }, DispatcherPriority.Background);
+                await ScrollChatToBottomAsync();
             }
+        }
+
+        private async Task ScrollChatToBottomAsync()
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (this.FindControl<ScrollViewer>("ChatScroll") is { } sv)
+                {
+                    var maxY = Math.Max(0, sv.Extent.Height - sv.Viewport.Height);
+                    sv.Offset = new Vector(sv.Offset.X, maxY);
+                }
+            }, DispatcherPriority.Render);
         }
 
         private void OpenSettings_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
