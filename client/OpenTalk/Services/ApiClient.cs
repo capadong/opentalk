@@ -1,0 +1,102 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using OpenTalk.Models;
+
+namespace OpenTalk.Services;
+
+public class ApiClient
+{
+    private readonly HttpClient _httpClient;
+
+    public ApiClient(string baseUrl)
+    {
+        _httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/")
+        };
+    }
+
+    public async Task<IReadOnlyList<ChatGroup>> GetGroupsAsync(long userId, CancellationToken cancellationToken = default)
+    {
+        return await _httpClient.GetFromJsonAsync<List<ChatGroup>>($"api/v1/groups/{userId}", cancellationToken)
+            ?? [];
+    }
+
+    public async Task<IReadOnlyList<GroupMember>> GetGroupMembersAsync(long groupId, CancellationToken cancellationToken = default)
+    {
+        return await _httpClient.GetFromJsonAsync<List<GroupMember>>($"api/v1/groups/{groupId}/members", cancellationToken)
+            ?? [];
+    }
+
+    public async Task<IReadOnlyList<ChatMessage>> GetMessagesAsync(long groupId, int limit = 50, long? beforeId = null, CancellationToken cancellationToken = default)
+    {
+        var query = beforeId.HasValue ? $"?limit={limit}&beforeId={beforeId.Value}" : $"?limit={limit}";
+        return await _httpClient.GetFromJsonAsync<List<ChatMessage>>($"api/v1/messages/{groupId}{query}", cancellationToken)
+            ?? [];
+    }
+
+    public async Task<IReadOnlyList<ChatMessage>> GetDirectMessagesAsync(long userId, long peerId, int limit = 50, long? beforeId = null, CancellationToken cancellationToken = default)
+    {
+        var query = beforeId.HasValue ? $"?limit={limit}&beforeId={beforeId.Value}" : $"?limit={limit}";
+        return await _httpClient.GetFromJsonAsync<List<ChatMessage>>($"api/v1/messages/direct/{userId}/{peerId}{query}", cancellationToken)
+            ?? [];
+    }
+
+    public async Task<UploadFileResult?> UploadFileAsync(string filePath, long uploaderId, CancellationToken cancellationToken = default)
+    {
+        await using var fileStream = File.OpenRead(filePath);
+        using var content = new MultipartFormDataContent();
+        using var streamContent = new StreamContent(fileStream);
+        content.Add(streamContent, "file", Path.GetFileName(filePath));
+        content.Add(new StringContent(uploaderId.ToString()), "uploaderId");
+
+        using var response = await _httpClient.PostAsync("api/v1/files/upload", content, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<UploadFileResult>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<string?> DownloadFileToCacheAsync(string fileUrl, string cacheDirectory, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(fileUrl))
+        {
+            return null;
+        }
+
+        Directory.CreateDirectory(cacheDirectory);
+
+        using var response = await _httpClient.GetAsync(fileUrl, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        if (content.Length == 0)
+        {
+            return null;
+        }
+
+        var ext = ResolveFileExtension(fileUrl);
+        var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(fileUrl))).ToLowerInvariant();
+        var localPath = Path.Combine(cacheDirectory, $"{hash[..24]}{ext}");
+
+        await File.WriteAllBytesAsync(localPath, content, cancellationToken);
+        return localPath;
+    }
+
+    private static string ResolveFileExtension(string fileUrl)
+    {
+        if (!Uri.TryCreate(fileUrl, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return ".bin";
+        }
+
+        var path = uri.IsAbsoluteUri ? uri.LocalPath : fileUrl;
+        var ext = Path.GetExtension(path);
+        return string.IsNullOrWhiteSpace(ext) ? ".bin" : ext;
+    }
+}

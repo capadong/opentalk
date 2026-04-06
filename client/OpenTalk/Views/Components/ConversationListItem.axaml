@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OpenTalk.ViewModels"
+             x:Class="OpenTalk.Views.Components.ConversationListItem"
+             x:DataType="vm:MainWindowViewModel+ConversationListEntry">
+    <Border Classes="wxConversationCard" Padding="10,8">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+            <Border Classes="wxAvatarCircle">
+                <TextBlock Classes="wxAvatarText" Text="{Binding AvatarText}"/>
+            </Border>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Classes="wxConversationName" Text="{Binding Title}"/>
+                <TextBlock Classes="wxConversationMeta" Text="{Binding Subtitle}"/>
+            </StackPanel>
+            <TextBlock Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Classes="wxConversationMeta"
+                       Text="{Binding TimeText}"/>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,6 +1,6 @@
 # OpenTalk
 
-A modern, real-time chat application with group messaging and direct messaging capabilities. Built with ASP.NET Core backend and Vue 3 frontend.
+A modern, real-time chat application with group messaging and direct messaging capabilities. Built with ASP.NET Core backend, Vue 3 web frontend, and an Avalonia desktop client.
 
 ## Features
 
@@ -26,13 +26,19 @@ A modern, real-time chat application with group messaging and direct messaging c
 - **ORM**: Dapper
 - **API Documentation**: Swagger/OpenAPI
 
-### Frontend
+### Web Frontend
 - **Framework**: Vue 3
 - **Build Tool**: Vite
 - **UI Library**: Element Plus
 - **HTTP Client**: Axios
 - **Routing**: Vue Router
 - **Language**: TypeScript
+
+### Desktop Client
+- **Framework**: Avalonia UI 11 (cross-platform desktop)
+- **Language**: C# / .NET 8
+- **Architecture**: MVVM (CommunityToolkit.Mvvm)
+- **Real-time**: SignalR Client
 
 ## Project Structure
 
@@ -48,14 +54,25 @@ OpenTalk/
 │       ├── Pages/               # Admin dashboard (Razor Pages)
 │       ├── sql/                 # Database schema
 │       └── Program.cs           # Application startup
-└── web/
-    └── opentalk-web/
-        ├── src/
-        │   ├── api/             # HTTP client configuration
-        │   ├── components/      # Vue components
-        │   ├── views/           # Page views
-        │   └── main.ts          # Entry point
-        └── package.json
+├── web/
+│   └── opentalk-web/
+│       ├── src/
+│       │   ├── api/             # HTTP client configuration
+│       │   ├── components/      # Vue components
+│       │   ├── views/           # Page views
+│       │   └── main.ts          # Entry point
+│       └── package.json
+└── client/
+    └── OpenTalk/                # Avalonia desktop client
+        ├── Assets/
+        ├── Models/
+        ├── Services/
+        ├── Styles/
+        ├── ViewModels/
+        ├── Views/
+        ├── App.axaml
+        ├── Program.cs
+        └── OpenTalk.csproj
 ```
 
 ## Getting Started
@@ -71,6 +88,7 @@ OpenTalk/
 1. **Configure Database Connection**
 
    Edit `server/OpenTalk.Api/appsettings.json`:
+
    ```json
    {
      "ConnectionStrings": {
@@ -96,7 +114,7 @@ OpenTalk/
    - Swagger UI: `https://localhost:5001/swagger`
    - Admin Dashboard: `https://localhost:5001/Admin/Dashboard`
 
-### Frontend Setup
+### Web Frontend Setup
 
 1. **Install Dependencies**
 
@@ -121,6 +139,23 @@ OpenTalk/
 
    ```bash
    npm run build
+   ```
+
+### Avalonia Desktop Client Setup
+
+1. **Restore & Run**
+
+   ```bash
+   cd client/OpenTalk
+   dotnet restore
+   dotnet run
+   ```
+
+2. **Build**
+
+   ```bash
+   cd client/OpenTalk
+   dotnet build -c Release
    ```
 
 ## Default Credentials
@@ -229,6 +264,12 @@ See `server/OpenTalk.Api/sql/schema.sql` for complete schema.
 - API calls in `src/api/`
 - Routing configuration in `src/router.ts`
 
+### Desktop Client Development
+
+- Views in `client/OpenTalk/Views/`
+- ViewModels in `client/OpenTalk/ViewModels/`
+- Services in `client/OpenTalk/Services/`
+
 ## Deployment
 
 ### Docker (Recommended)
@@ -238,7 +279,7 @@ Create a `Dockerfile` for the backend and frontend, then deploy using Docker Com
 ### Manual Deployment
 
 1. Build the backend: `dotnet publish -c Release`
-2. Build the frontend: `npm run build`
+2. Build the web frontend: `npm run build`
 3. Deploy to your hosting platform
 4. Configure environment variables and database connection
 5. Set up SSL certificates for HTTPS
@@ -257,4 +298,4 @@ For issues, questions, or suggestions, please open an issue on GitHub.
 
 ---
 
-**Built with ❤️ using ASP.NET Core and Vue 3**
+**Built with ❤️ using ASP.NET Core, Vue 3, and Avalonia UI**
