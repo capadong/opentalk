@@ -296,6 +296,18 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 For issues, questions, or suggestions, please open an issue on GitHub.
 
+## Donate / 打赏
+
+如果这个项目对你有帮助，欢迎请作者喝杯咖啡 / 打赏一点点支持继续维护与迭代。
+
+- **支付宝**（`ali.jpg`）
+
+  ![支付宝收款码](ali.jpg)
+
+- **微信**（`wx.jpg`）
+
+  ![微信收款码](wx.jpg)
+
 ---
 
 **Built with ❤️ using ASP.NET Core, Vue 3, and Avalonia UI**
