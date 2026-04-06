@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using OpenTalk.Models;
 
@@ -21,6 +19,7 @@ public sealed class ChatMessageItemViewModel
     public int Type { get; init; }
     public string Content { get; init; } = string.Empty;
     public string? FileUrl { get; init; }
+    public string? CachedFilePath { get; init; }
     public DateTime CreatedAt { get; init; }
 
     // Image support
@@ -32,23 +31,30 @@ public sealed class ChatMessageItemViewModel
     {
         get
         {
-            if (!IsImage || string.IsNullOrWhiteSpace(FileUrl))
+            if (!IsImage)
             {
                 return null;
             }
 
             try
             {
-                // Avalonia Bitmap can load from file path or stream.
-                // Backend returns a URL; in this demo client we also support local paths.
+                if (!string.IsNullOrWhiteSpace(CachedFilePath))
+                {
+                    return new Bitmap(CachedFilePath);
+                }
+
+                if (string.IsNullOrWhiteSpace(FileUrl))
+                {
+                    return null;
+                }
+
                 if (Uri.TryCreate(FileUrl, UriKind.Absolute, out var uri))
                 {
-                    if (uri.IsFile)
+                    if (uri.IsFile && !string.IsNullOrWhiteSpace(uri.LocalPath))
                     {
                         return new Bitmap(uri.LocalPath);
                     }
 
-                    // For http(s) we fall back to showing the link; downloading is handled elsewhere.
                     return null;
                 }
 
@@ -61,7 +67,7 @@ public sealed class ChatMessageItemViewModel
         }
     }
 
-    public static ChatMessageItemViewModel FromMessage(ChatMessage message, long currentUserId, IEnumerable<GroupMember> members)
+    public static ChatMessageItemViewModel FromMessage(ChatMessage message, long currentUserId, IEnumerable<GroupMember> members, string? cachedFilePath = null)
     {
         var member = members is null
             ? null
@@ -78,6 +84,7 @@ public sealed class ChatMessageItemViewModel
             Type = message.Type,
             Content = message.Content,
             FileUrl = message.FileUrl,
+            CachedFilePath = cachedFilePath,
             CreatedAt = message.CreatedAt
         };
     }

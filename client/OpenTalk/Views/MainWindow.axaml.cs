@@ -3,15 +3,19 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using System.Collections.Specialized;
 using OpenTalk.ViewModels;
 
 namespace OpenTalk.Views
 {
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel? _subscribedVm;
+
         public MainWindow()
         {
             InitializeComponent();
+            DataContextChanged += MainWindow_DataContextChanged;
         }
 
         private async void ChatScroll_OnScrollChanged(object? sender, ScrollChangedEventArgs e)
@@ -84,6 +88,44 @@ namespace OpenTalk.Views
             }
 
             await vm.SendPickedFileAsync(file.Path.LocalPath);
+        }
+
+        private void MainWindow_DataContextChanged(object? sender, System.EventArgs e)
+        {
+            if (_subscribedVm is not null)
+            {
+                _subscribedVm.Messages.CollectionChanged -= Messages_CollectionChanged;
+            }
+
+            _subscribedVm = DataContext as MainWindowViewModel;
+            if (_subscribedVm is not null)
+            {
+                _subscribedVm.Messages.CollectionChanged += Messages_CollectionChanged;
+            }
+        }
+
+        private async void Messages_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (DataContext is not MainWindowViewModel vm)
+            {
+                return;
+            }
+
+            if (vm.PendingPrependedCount > 0 && e.NewStartingIndex == 0)
+            {
+                return;
+            }
+
+            if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Reset)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (this.FindControl<ScrollViewer>("ChatScroll") is { } sv)
+                    {
+                        sv.Offset = new Vector(sv.Offset.X, sv.Extent.Height);
+                    }
+                }, DispatcherPriority.Background);
+            }
         }
 
         private void OpenSettings_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

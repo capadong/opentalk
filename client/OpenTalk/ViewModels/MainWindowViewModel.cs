@@ -20,8 +20,12 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ApiClient _apiClient;
     private readonly ChatHubClient _chatHubClient;
     private long? _joinedGroupId;
+    private readonly string _imageCacheDir;
+    private readonly Dictionary<string, string> _imageCache = new(StringComparer.OrdinalIgnoreCase);
+    private bool _suppressConversationSelectionChanged;
 
     public ObservableCollection<ChatGroup> Groups { get; } = [];
+    public ObservableCollection<ConversationListEntry> Conversations { get; } = [];
     public ObservableCollection<ChatMessageItemViewModel> Messages { get; } = [];
     public ObservableCollection<GroupMember> Members { get; } = [];
 
@@ -30,6 +34,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     private GroupMember? selectedPeer;
+
+    [ObservableProperty]
+    private ConversationListEntry? selectedConversation;
 
     [ObservableProperty]
     private ConversationMode conversationMode = ConversationMode.Group;
@@ -73,6 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         _apiClient = new ApiClient(DefaultApiBase);
         _chatHubClient = new ChatHubClient(DefaultApiBase);
+        _imageCacheDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OpenTalk", "image-cache");
         _chatHubClient.GroupMessageReceived += OnGroupMessageReceived;
         _chatHubClient.DirectMessageReceived += OnDirectMessageReceived;
         _chatHubClient.StateChanged += HandleConnectionStateChanged;
@@ -95,15 +103,42 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnSelectedGroupChanged(ChatGroup? value)
     {
         NotifyCanExecuteChanged();
-        if (value is not null && ConversationMode == ConversationMode.Group)
-        {
-            _ = SelectGroupAsync(value);
-        }
     }
 
     partial void OnSelectedPeerChanged(GroupMember? value)
     {
         NotifyCanExecuteChanged();
+    }
+
+    partial void OnSelectedConversationChanged(ConversationListEntry? value)
+    {
+        if (_suppressConversationSelectionChanged || value is null)
+        {
+            return;
+        }
+
+        if (value.IsGroup)
+        {
+            var group = Groups.FirstOrDefault(g => g.Id == value.GroupId);
+            if (group is null || (ConversationMode == ConversationMode.Group && SelectedGroup?.Id == group.Id))
+            {
+                return;
+            }
+
+            ConversationMode = ConversationMode.Group;
+            SelectedPeer = null;
+            SelectedGroup = group;
+            _ = SelectGroupAsync(group);
+            return;
+        }
+
+        var target = value.Member ?? Members.FirstOrDefault(m => m.UserId == value.PeerUserId);
+        if (target is null || target.UserId == CurrentUserId || (ConversationMode == ConversationMode.Direct && SelectedPeer?.UserId == target.UserId))
+        {
+            return;
+        }
+
+        _ = OpenDirectChatAsync(target);
     }
 
     partial void OnConversationModeChanged(ConversationMode value)
@@ -257,12 +292,18 @@ public partial class MainWindowViewModel : ViewModelBase
                 return;
             }
 
+            var olderItems = new List<ChatMessageItemViewModel>(older.Count);
+            foreach (var msg in older)
+            {
+                olderItems.Add(await ToMessageItemAsync(msg));
+            }
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                PendingPrependedCount = older.Count;
-                for (var i = 0; i < older.Count; i++)
+                PendingPrependedCount = olderItems.Count;
+                for (var i = 0; i < olderItems.Count; i++)
                 {
-                    Messages.Insert(i, ChatMessageItemViewModel.FromMessage(older[i], CurrentUserId, Members));
+                    Messages.Insert(i, olderItems[i]);
                 }
                 UpdateSubtitle();
             });
@@ -286,6 +327,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ConversationMode = ConversationMode.Group;
         SelectedPeer = null;
+        SelectConversationByGroupId(SelectedGroup.Id);
         await SelectGroupAsync(SelectedGroup);
     }
 
@@ -300,11 +342,13 @@ public partial class MainWindowViewModel : ViewModelBase
         SelectedPeer = member;
         Messages.Clear();
         StatusText = $"正在打开与 {member.DisplayName} 的私聊…";
+        EnsurePeerConversation(member);
+        SelectConversationByPeerId(member.UserId);
 
         var messages = (await _apiClient.GetDirectMessagesAsync(CurrentUserId, member.UserId)).Reverse().ToList();
         foreach (var message in messages)
         {
-            Messages.Add(ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members));
+            Messages.Add(await ToMessageItemAsync(message));
         }
 
         CurrentTitle = member.DisplayName;
@@ -332,12 +376,15 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     Groups.Add(group);
                 }
+
+                RebuildConversations();
             });
 
             if (groups.Count > 0)
             {
                 SelectedGroup = groups[0];
                 ConversationMode = ConversationMode.Group;
+                SelectConversationByGroupId(groups[0].Id);
                 await SelectGroupAsync(groups[0]);
             }
             else
@@ -386,13 +433,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
             // Defensive: keep UI member list unique even if backend returns duplicates.
             DeduplicateMembers();
+            RebuildConversations();
+            SelectConversationByGroupId(group.Id);
 
             UpdateSubtitle();
 
             var recent = (await _apiClient.GetMessagesAsync(group.Id, 50)).Reverse().ToList();
             foreach (var message in recent)
             {
-                Messages.Add(ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members));
+                Messages.Add(await ToMessageItemAsync(message));
             }
 
             CurrentTitle = group.Name;
@@ -469,11 +518,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        Dispatcher.UIThread.Post(() =>
-        {
-            Messages.Add(ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members));
-            UpdateSubtitle();
-        });
+        _ = AppendIncomingMessageAsync(message);
     }
 
     private void OnDirectMessageReceived(ChatMessage message)
@@ -496,11 +541,136 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        _ = AppendIncomingMessageAsync(message);
+    }
+
+    private async Task AppendIncomingMessageAsync(ChatMessage message)
+    {
+        var item = await ToMessageItemAsync(message);
         Dispatcher.UIThread.Post(() =>
         {
-            Messages.Add(ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members));
+            Messages.Add(item);
             UpdateSubtitle();
         });
     }
-}
 
+    private async Task<ChatMessageItemViewModel> ToMessageItemAsync(ChatMessage message)
+    {
+        string? cachedImagePath = null;
+        if (message.Type == 2 && !string.IsNullOrWhiteSpace(message.FileUrl))
+        {
+            cachedImagePath = await GetOrDownloadImageCachePathAsync(message.FileUrl);
+        }
+
+        return ChatMessageItemViewModel.FromMessage(message, CurrentUserId, Members, cachedImagePath);
+    }
+
+    private async Task<string?> GetOrDownloadImageCachePathAsync(string fileUrl)
+    {
+        if (_imageCache.TryGetValue(fileUrl, out var existing) && File.Exists(existing))
+        {
+            return existing;
+        }
+
+        try
+        {
+            var downloaded = await _apiClient.DownloadFileToCacheAsync(fileUrl, _imageCacheDir);
+            if (!string.IsNullOrWhiteSpace(downloaded))
+            {
+                _imageCache[fileUrl] = downloaded;
+            }
+
+            return downloaded;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void RebuildConversations()
+    {
+        Conversations.Clear();
+
+        foreach (var group in Groups)
+        {
+            Conversations.Add(ConversationListEntry.FromGroup(group));
+        }
+
+        foreach (var member in Members
+                     .Where(m => m.UserId != CurrentUserId)
+                     .GroupBy(m => m.UserId)
+                     .Select(g => g.First())
+                     .OrderBy(m => m.DisplayName, StringComparer.OrdinalIgnoreCase))
+        {
+            Conversations.Add(ConversationListEntry.FromMember(member));
+        }
+    }
+
+    private void EnsurePeerConversation(GroupMember member)
+    {
+        if (Conversations.Any(c => !c.IsGroup && c.PeerUserId == member.UserId))
+        {
+            return;
+        }
+
+        Conversations.Add(ConversationListEntry.FromMember(member));
+    }
+
+    private void SelectConversationByGroupId(long groupId)
+    {
+        var conversation = Conversations.FirstOrDefault(c => c.IsGroup && c.GroupId == groupId);
+        SetSelectedConversationSilently(conversation);
+    }
+
+    private void SelectConversationByPeerId(long peerId)
+    {
+        var conversation = Conversations.FirstOrDefault(c => !c.IsGroup && c.PeerUserId == peerId);
+        SetSelectedConversationSilently(conversation);
+    }
+
+    private void SetSelectedConversationSilently(ConversationListEntry? entry)
+    {
+        _suppressConversationSelectionChanged = true;
+        SelectedConversation = entry;
+        _suppressConversationSelectionChanged = false;
+    }
+
+    public sealed class ConversationListEntry
+    {
+        public bool IsGroup { get; init; }
+        public long GroupId { get; init; }
+        public long PeerUserId { get; init; }
+        public string Title { get; init; } = string.Empty;
+        public string Subtitle { get; init; } = string.Empty;
+        public DateTime SortTime { get; init; }
+        public GroupMember? Member { get; init; }
+        public string AvatarText => IsGroup ? "群" : "人";
+        public string TimeText => SortTime == default ? string.Empty : SortTime.ToString("MM/dd");
+
+        public static ConversationListEntry FromGroup(ChatGroup group)
+        {
+            return new ConversationListEntry
+            {
+                IsGroup = true,
+                GroupId = group.Id,
+                Title = group.Name,
+                Subtitle = $"群聊 #{group.Id}",
+                SortTime = group.CreatedAt
+            };
+        }
+
+        public static ConversationListEntry FromMember(GroupMember member)
+        {
+            return new ConversationListEntry
+            {
+                IsGroup = false,
+                PeerUserId = member.UserId,
+                Title = member.DisplayName,
+                Subtitle = $"@{member.Username}",
+                SortTime = member.JoinedAt,
+                Member = member
+            };
+        }
+    }
+}

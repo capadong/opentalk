@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using OpenTalk.Models;
@@ -58,5 +60,43 @@ public class ApiClient
         using var response = await _httpClient.PostAsync("api/v1/files/upload", content, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<UploadFileResult>(cancellationToken: cancellationToken);
+    }
+
+    public async Task<string?> DownloadFileToCacheAsync(string fileUrl, string cacheDirectory, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(fileUrl))
+        {
+            return null;
+        }
+
+        Directory.CreateDirectory(cacheDirectory);
+
+        using var response = await _httpClient.GetAsync(fileUrl, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        if (content.Length == 0)
+        {
+            return null;
+        }
+
+        var ext = ResolveFileExtension(fileUrl);
+        var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(fileUrl))).ToLowerInvariant();
+        var localPath = Path.Combine(cacheDirectory, $"{hash[..24]}{ext}");
+
+        await File.WriteAllBytesAsync(localPath, content, cancellationToken);
+        return localPath;
+    }
+
+    private static string ResolveFileExtension(string fileUrl)
+    {
+        if (!Uri.TryCreate(fileUrl, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return ".bin";
+        }
+
+        var path = uri.IsAbsoluteUri ? uri.LocalPath : fileUrl;
+        var ext = Path.GetExtension(path);
+        return string.IsNullOrWhiteSpace(ext) ? ".bin" : ext;
     }
 }

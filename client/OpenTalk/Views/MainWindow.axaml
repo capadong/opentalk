@@ -1,7 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:OpenTalk.ViewModels"
-        xmlns:model="using:OpenTalk.Models"
         xmlns:components="using:OpenTalk.Views.Components"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -52,9 +51,9 @@
                     <Button Grid.Column="1" Classes="wxIconAction" Command="{Binding RefreshCommand}" Content="⟳"/>
                 </Grid>
 
-                <ListBox Grid.Row="2" Classes="wxConversationList" ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}">
+                <ListBox Grid.Row="2" Classes="wxConversationList" ItemsSource="{Binding Conversations}" SelectedItem="{Binding SelectedConversation}">
                     <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="model:ChatGroup">
+                        <DataTemplate x:DataType="vm:MainWindowViewModel+ConversationListEntry">
                             <components:ConversationListItem/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -75,7 +74,7 @@
         <Border Grid.Column="2" Classes="wxChatPane">
             <Grid RowDefinitions="Auto,*,Auto">
                 <Border Grid.Row="0" Classes="wxHeader" Padding="18,12">
-                    <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+                    <Grid RowDefinitions="Auto">
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                             <StackPanel Spacing="2">
                                 <TextBlock FontSize="22" FontWeight="SemiBold" Text="{Binding CurrentTitle}"/>
@@ -85,31 +84,8 @@
                                 <Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.CardBorderBrush}" BorderThickness="1" CornerRadius="16" Padding="10,4">
                                     <TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" Text="{Binding CurrentUserLabel}"/>
                                 </Border>
-                                <Button Classes="wxGhostAction" Click="OpenSettings_OnClick">设置</Button>
-                                <Button Classes="wxPrimaryAction" Command="{Binding OpenGroupChatCommand}" IsVisible="{Binding IsDirectMode}">返回群聊</Button>
                             </StackPanel>
                         </Grid>
-                        <ScrollViewer Grid.Row="1"
-                                      IsVisible="{Binding IsGroupMode}"
-                                      HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Disabled">
-                            <ItemsControl ItemsSource="{Binding Members}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" Spacing="8"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="model:GroupMember">
-                                        <Button Classes="wxMemberAction"
-                                                Command="{Binding #RootWindow.DataContext.OpenDirectChatCommand}"
-                                                CommandParameter="{Binding}">
-                                            <components:MemberChip/>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
                     </Grid>
                 </Border>
 

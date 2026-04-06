@@ -13,20 +13,20 @@
             <TextBlock FontSize="12" Classes="wxMutedText" Text="{Binding SenderName}"/>
             <Border Classes="wxOtherBubble" Padding="12,8">
                 <StackPanel Spacing="8">
-                    <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
+                    <TextBlock IsVisible="{Binding IsText}" TextWrapping="WrapWithOverflow" Text="{Binding Content}"/>
 
                     <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
                         <StackPanel Spacing="6">
                             <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
-                            <TextBlock FontSize="11" Classes="wxMutedText" Text="{Binding Content}"/>
-                            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                            <TextBlock FontSize="11" Classes="wxMutedText" Text="{Binding Content}" TextWrapping="WrapWithOverflow"/>
+                            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding FileUrl}" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
 
                     <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
                         <StackPanel Spacing="4">
-                            <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
-                            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                            <TextBlock FontWeight="SemiBold" Text="{Binding Content}" TextWrapping="WrapWithOverflow"/>
+                            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding FileUrl}" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -38,20 +38,20 @@
             <TextBlock FontSize="12" HorizontalAlignment="Right" Text="{Binding SenderName}" Foreground="{DynamicResource OT.AccentTextBrush}"/>
             <Border Classes="wxSelfBubble" Padding="12,8">
                 <StackPanel Spacing="8">
-                    <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
+                    <TextBlock IsVisible="{Binding IsText}" TextWrapping="WrapWithOverflow" Text="{Binding Content}"/>
 
                     <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
                         <StackPanel Spacing="6">
                             <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
-                            <TextBlock FontSize="11" Foreground="#EAFCE8" Text="{Binding Content}"/>
-                            <TextBlock FontSize="11" Foreground="#D6F8D2" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                            <TextBlock FontSize="11" Foreground="#EAFCE8" Text="{Binding Content}" TextWrapping="WrapWithOverflow"/>
+                            <TextBlock FontSize="11" Foreground="#D6F8D2" Text="{Binding FileUrl}" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
 
                     <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
                         <StackPanel Spacing="4">
-                            <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
-                            <TextBlock FontSize="11" Foreground="#D6F8D2" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                            <TextBlock FontWeight="SemiBold" Text="{Binding Content}" TextWrapping="WrapWithOverflow"/>
+                            <TextBlock FontSize="11" Foreground="#D6F8D2" Text="{Binding FileUrl}" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

@@ -56,7 +56,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Classes="caption" Text="当前选择：{Binding ThemeLabel}"/>
+					<TextBlock Classes="caption" Text="{Binding ThemeLabel, StringFormat='当前选择：{0}'}" />
                 </StackPanel>
             </Border>
 
