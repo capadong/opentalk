@@ -4,7 +4,10 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using OpenTalk.ViewModels;
+using System;
 
 namespace OpenTalk.Views.Components;
 
@@ -32,6 +35,42 @@ public partial class ChatMessageBubble : UserControl
         var preview = CreatePreviewWindow(source, vm.Content, owner);
         preview.Show();
         e.Handled = true;
+    }
+
+    private async void MessageImage_OnSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        if (e.NewSize.Height <= 0 || Math.Abs(e.NewSize.Height - e.PreviousSize.Height) < 1)
+        {
+            return;
+        }
+
+        if (this.FindAncestorOfType<ScrollViewer>() is not { } sv)
+        {
+            return;
+        }
+
+        var oldMaxY = Math.Max(0, sv.Extent.Height - sv.Viewport.Height);
+        var wasNearBottom = Math.Abs(oldMaxY - sv.Offset.Y) <= 96;
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            InvalidateMeasure();
+            InvalidateArrange();
+            sv.InvalidateMeasure();
+            sv.InvalidateArrange();
+            sv.UpdateLayout();
+
+            if (!wasNearBottom)
+            {
+                return;
+            }
+
+            var newMaxY = Math.Max(0, sv.Extent.Height - sv.Viewport.Height);
+            if (Math.Abs(newMaxY - sv.Offset.Y) > 1)
+            {
+                sv.Offset = new Vector(sv.Offset.X, newMaxY);
+            }
+        }, DispatcherPriority.Background);
     }
 
     private static Window CreatePreviewWindow(Bitmap source, string title, Window? owner)

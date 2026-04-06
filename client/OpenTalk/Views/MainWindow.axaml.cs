@@ -3,8 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Threading.Tasks;
 using OpenTalk.ViewModels;
 
@@ -13,6 +15,7 @@ namespace OpenTalk.Views
     public partial class MainWindow : Window
     {
         private MainWindowViewModel? _subscribedVm;
+        private ScrollViewer? _chatScrollViewer;
 
         public MainWindow()
         {
@@ -46,8 +49,8 @@ namespace OpenTalk.Views
                 // If we prepended items, compensate scroll so content doesn't jump.
                 if (vm.PendingPrependedCount > 0)
                 {
-                    // Let layout run once so Extent updates.
                     await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
+                    sv.UpdateLayout();
 
                     var newExtent = sv.Extent.Height;
                     var delta = newExtent - oldExtent;
@@ -59,6 +62,11 @@ namespace OpenTalk.Views
                     vm.PendingPrependedCount = 0;
                 }
             }
+        }
+
+        private void ChatMessagesList_OnLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            AttachChatScrollViewer();
         }
 
         private async void MessageInput_OnKeyDown(object? sender, KeyEventArgs e)
@@ -120,6 +128,7 @@ namespace OpenTalk.Views
 
             if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Reset)
             {
+                await Task.Delay(10);
                 await ScrollChatToBottomAsync();
             }
         }
@@ -129,12 +138,44 @@ namespace OpenTalk.Views
             await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                if (this.FindControl<ScrollViewer>("ChatScroll") is { } sv)
+                if (FindChatScrollViewer() is { } sv)
                 {
+                    sv.UpdateLayout();
                     var maxY = Math.Max(0, sv.Extent.Height - sv.Viewport.Height);
-                    sv.Offset = new Vector(sv.Offset.X, maxY);
+                    if (Math.Abs(sv.Offset.Y - maxY) > 1)
+                    {
+                        sv.Offset = new Vector(sv.Offset.X, maxY);
+                    }
                 }
             }, DispatcherPriority.Render);
+        }
+
+        private void AttachChatScrollViewer()
+        {
+            if (FindChatScrollViewer() is not { } sv || ReferenceEquals(_chatScrollViewer, sv))
+            {
+                return;
+            }
+
+            if (_chatScrollViewer is not null)
+            {
+                _chatScrollViewer.ScrollChanged -= ChatScroll_OnScrollChanged;
+            }
+
+            _chatScrollViewer = sv;
+            _chatScrollViewer.ScrollChanged += ChatScroll_OnScrollChanged;
+        }
+
+        private ScrollViewer? FindChatScrollViewer()
+        {
+            if (_chatScrollViewer is not null)
+            {
+                return _chatScrollViewer;
+            }
+
+            var list = this.FindControl<ListBox>("ChatMessagesList");
+            _chatScrollViewer = list?.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+            return _chatScrollViewer;
         }
 
         private void OpenSettings_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

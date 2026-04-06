@@ -48,7 +48,7 @@
 
                 <Grid Grid.Row="1" Margin="0,12,0,10" ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <TextBox Classes="wxSearchBox" Watermark="搜索" IsReadOnly="True"/>
-                    <Button Grid.Column="1" Classes="wxIconAction" Command="{Binding RefreshCommand}" Content="⟳"/>
+                    <Button Grid.Column="1" Classes="wxIconAction" Command="{Binding RefreshCommand}" Content="⟳" />
                 </Grid>
 
                 <ListBox Grid.Row="2" Classes="wxConversationList" ItemsSource="{Binding Conversations}" SelectedItem="{Binding SelectedConversation}">
@@ -89,20 +89,25 @@
                     </Grid>
                 </Border>
 
-                <ScrollViewer Grid.Row="1"
-                              Name="ChatScroll"
-                              Padding="18,14"
-                              VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled"
-                              ScrollChanged="ChatScroll_OnScrollChanged">
-                    <ItemsControl ItemsSource="{Binding Messages}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ChatMessageItemViewModel">
-                                <components:ChatMessageBubble/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                <ListBox Grid.Row="1"
+                         Name="ChatMessagesList"
+                         Classes="wxChatMessageList"
+                         Padding="18,14,12,14"
+                         ItemsSource="{Binding Messages}"
+                         Loaded="ChatMessagesList_OnLoaded"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel VerticalAlignment="Top"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ChatMessageItemViewModel">
+                            <components:ChatMessageBubble/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
                 <Border Grid.Row="2" Classes="wxInputPane" Padding="14,10">
                     <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
