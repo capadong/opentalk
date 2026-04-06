@@ -302,11 +302,11 @@ For issues, questions, or suggestions, please open an issue on GitHub.
 
 - **支付宝**（`ali.jpg`）
 
-  ![支付宝收款码](screenshot/ali.jpg)
+  <img src="screenshot/ali.jpg" alt="支付宝收款码" width="240" />
 
 - **微信**（`wx.jpg`）
 
-  ![微信收款码](screenshot/wx.jpg)
+  <img src="screenshot/wx.jpg" alt="微信收款码" width="240" />
 
 ---
 
