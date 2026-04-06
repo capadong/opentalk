@@ -1,215 +1,187 @@
-<Styles xmlns="https://github.com/avaloniaui">
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Style Selector="Border.wxNavRail">
-        <Setter Property="Background" Value="{DynamicResource OT.SidebarBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0,0,1,0"/>
-    </Style>
+	<Style Selector="Border.wxNavRail">
+		<Setter Property="Background" Value="{DynamicResource OT.SidebarBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
+		<Setter Property="BorderThickness" Value="0,0,1,0"/>
+	</Style>
 
-    <Style Selector="Border.wxConversationPane">
-        <Setter Property="Background" Value="{DynamicResource OT.ListPaneBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0,0,1,0"/>
-    </Style>
+	<Style Selector="Border.wxConversationPane">
+		<Setter Property="Background" Value="{DynamicResource OT.ListPaneBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
+		<Setter Property="BorderThickness" Value="0,0,1,0"/>
+	</Style>
 
-    <Style Selector="Border.wxChatPane">
-        <Setter Property="Background" Value="{DynamicResource OT.ChatAreaBgBrush}"/>
-    </Style>
+	<Style Selector="Border.wxChatPane">
+		<Setter Property="Background" Value="{DynamicResource OT.ChatAreaBgBrush}"/>
+	</Style>
 
-    <Style Selector="Border.wxHeader">
-        <Setter Property="Background" Value="{DynamicResource OT.TopbarBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-    </Style>
+	<Style Selector="Border.wxHeader">
+		<Setter Property="Background" Value="{DynamicResource OT.TopbarBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
+		<Setter Property="BorderThickness" Value="0,0,0,1"/>
+	</Style>
 
-    <Style Selector="Border.wxInputPane">
-        <Setter Property="Background" Value="{DynamicResource OT.InputBarBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0,1,0,0"/>
-    </Style>
+	<Style Selector="Border.wxInputPane">
+		<Setter Property="Background" Value="{DynamicResource OT.InputBarBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.BorderBrush}"/>
+		<Setter Property="BorderThickness" Value="0,1,0,0"/>
+	</Style>
 
-    <Style Selector="Button.wxRailButton">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextMutedBrush}"/>
-        <Setter Property="Padding" Value="8"/>
-        <Setter Property="CornerRadius" Value="10"/>
-    </Style>
+	<Style Selector="Button.wxRailButton">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextMutedBrush}"/>
+		<Setter Property="Padding" Value="8"/>
+		<Setter Property="CornerRadius" Value="10"/>
+	</Style>
 
-    <Style Selector="Button.wxRailButton:pointerover">
-        <Setter Property="Background" Value="{DynamicResource OT.CardHoverBgBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
-    </Style>
+	<Style Selector="Button.wxRailButton:pointerover">
+		<Setter Property="Background" Value="{DynamicResource OT.CardHoverBgBrush}"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
+	</Style>
 
-    <Style Selector="Button.wxPrimaryAction">
-        <Setter Property="Background" Value="{DynamicResource OT.ButtonBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.ButtonBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Foreground" Value="#FFFFFF"/>
-        <Setter Property="Padding" Value="16,8"/>
-        <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-    </Style>
+	<Style Selector="Button.wxPrimaryAction">
+		<Setter Property="Background" Value="{DynamicResource OT.ButtonBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.ButtonBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="Foreground" Value="#FFFFFF"/>
+		<Setter Property="Padding" Value="16,8"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+	</Style>
 
-    <Style Selector="Button.wxPrimaryAction:disabled">
-        <Setter Property="Opacity" Value="0.6"/>
-    </Style>
+	<Style Selector="Button.wxPrimaryAction:disabled">
+		<Setter Property="Opacity" Value="0.6"/>
+	</Style>
 
-    <Style Selector="Button.wxGhostAction">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.GhostBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.GhostTextBrush}"/>
-        <Setter Property="Padding" Value="12,8"/>
-        <Setter Property="CornerRadius" Value="8"/>
-    </Style>
+	<Style Selector="Button.wxGhostAction">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.GhostBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.GhostTextBrush}"/>
+		<Setter Property="Padding" Value="12,8"/>
+		<Setter Property="CornerRadius" Value="8"/>
+	</Style>
 
-    <Style Selector="Button.wxIconAction">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.GhostBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextMutedBrush}"/>
-        <Setter Property="Padding" Value="4,8"/>
-        <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="MinWidth" Value="34"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-    </Style>
+	<Style Selector="Button.wxIconAction">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.GhostBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextMutedBrush}"/>
+		<Setter Property="Padding" Value="4,8"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="MinWidth" Value="34"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+	</Style>
 
-    <Style Selector="TextBox.wxSearchBox">
-        <Setter Property="Background" Value="{DynamicResource OT.InputBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
-        <Setter Property="Padding" Value="12,8"/>
-    </Style>
+	<Style Selector="TextBox.wxSearchBox">
+		<Setter Property="Background" Value="{DynamicResource OT.InputBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
+		<Setter Property="Padding" Value="12,8"/>
+	</Style>
 
-    <Style Selector="TextBox.wxComposer">
-        <Setter Property="Background" Value="{DynamicResource OT.InputBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
-        <Setter Property="CaretBrush" Value="{DynamicResource OT.AccentTextBrush}"/>
-        <Setter Property="SelectionBrush" Value="{DynamicResource OT.SelectionBrush}"/>
-        <Setter Property="SelectionForegroundBrush" Value="#FFFFFF"/>
-        <Setter Property="Padding" Value="12,10"/>
-        <Setter Property="FontSize" Value="14"/>
-    </Style>
+	<Style Selector="TextBox.wxComposer">
+		<Setter Property="Background" Value="{DynamicResource OT.InputBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
+		<Setter Property="CaretBrush" Value="{DynamicResource OT.AccentTextBrush}"/>
+		<Setter Property="SelectionBrush" Value="{DynamicResource OT.SelectionBrush}"/>
+		<Setter Property="SelectionForegroundBrush" Value="#FFFFFF"/>
+		<Setter Property="Padding" Value="12,10"/>
+		<Setter Property="FontSize" Value="14"/>
+	</Style>
 
-    <Style Selector="TextBlock.wxPaneTitle">
-        <Setter Property="FontSize" Value="22"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-    </Style>
+	<Style Selector="TextBlock.wxPaneTitle">
+		<Setter Property="FontSize" Value="22"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+	</Style>
 
-    <Style Selector="TextBlock.wxMutedText">
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextMutedBrush}"/>
-    </Style>
+	<Style Selector="TextBlock.wxMutedText">
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextMutedBrush}"/>
+	</Style>
 
-    <Style Selector="TextBlock.wxSubtleText">
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextSubtleBrush}"/>
-    </Style>
+	<Style Selector="TextBlock.wxSubtleText">
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextSubtleBrush}"/>
+	</Style>
 
-    <Style Selector="ListBox.wxConversationList">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-    </Style>
+	<Style Selector="ListBox.wxChatMessageList > ListBoxItem">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="FocusAdorner" Value="{x:Null}"/>
 
-    <Style Selector="ListBox.wxConversationList > ListBoxItem">
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="Margin" Value="0,0,0,6"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-    </Style>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter
+				Content="{TemplateBinding Content}"
+				ContentTemplate="{TemplateBinding ContentTemplate}"/>
+			</ControlTemplate>
+		</Setter>
+	</Style>
 
-    <Style Selector="ListBox.wxConversationList > ListBoxItem:selected Border.wxConversationCard">
-        <Setter Property="Background" Value="{DynamicResource OT.CardSelectedBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.CardSelectedBorderBrush}"/>
-    </Style>
+	<Style Selector="Border.wxConversationCard">
+		<Setter Property="Background" Value="{DynamicResource OT.CardBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.CardBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="CornerRadius" Value="10"/>
+	</Style>
 
-    <Style Selector="ListBox.wxConversationList > ListBoxItem:pointerover Border.wxConversationCard">
-        <Setter Property="Background" Value="{DynamicResource OT.CardHoverBgBrush}"/>
-    </Style>
+	<Style Selector="Border.wxAvatarCircle">
+		<Setter Property="Background" Value="{DynamicResource OT.AvatarBgBrush}"/>
+		<Setter Property="CornerRadius" Value="999"/>
+		<Setter Property="Width" Value="42"/>
+		<Setter Property="Height" Value="42"/>
+	</Style>
 
-    <Style Selector="ListBox.wxChatMessageList">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-    </Style>
+	<Style Selector="TextBlock.wxAvatarText">
+		<Setter Property="FontSize" Value="15"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="Foreground" Value="#FFFFFF"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+	</Style>
 
-    <Style Selector="ListBox.wxChatMessageList > ListBoxItem">
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        <Setter Property="VerticalContentAlignment" Value="Top"/>
-    </Style>
+	<Style Selector="TextBlock.wxConversationName">
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+	</Style>
 
-    <Style Selector="ListBox.wxChatMessageList > ListBoxItem:pointerover">
-        <Setter Property="Background" Value="Transparent"/>
-    </Style>
+	<Style Selector="TextBlock.wxConversationMeta">
+		<Setter Property="FontSize" Value="11"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextSubtleBrush}"/>
+	</Style>
 
-    <Style Selector="ListBox.wxChatMessageList > ListBoxItem:selected">
-        <Setter Property="Background" Value="Transparent"/>
-    </Style>
+	<Style Selector="Button.wxMemberAction">
+		<Setter Property="Background" Value="{DynamicResource OT.CardBgBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.CardBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="CornerRadius" Value="18"/>
+		<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+	</Style>
 
-    <Style Selector="Border.wxConversationCard">
-        <Setter Property="Background" Value="{DynamicResource OT.CardBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.CardBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
-    </Style>
+	<Style Selector="Button.wxMemberAction:pointerover">
+		<Setter Property="Background" Value="{DynamicResource OT.CardHoverBgBrush}"/>
+	</Style>
 
-    <Style Selector="Border.wxAvatarCircle">
-        <Setter Property="Background" Value="{DynamicResource OT.AvatarBgBrush}"/>
-        <Setter Property="CornerRadius" Value="999"/>
-        <Setter Property="Width" Value="42"/>
-        <Setter Property="Height" Value="42"/>
-    </Style>
+	<Style Selector="Border.wxSelfBubble">
+		<Setter Property="Background" Value="{DynamicResource OT.SelfBubbleBgBrush}"/>
+		<Setter Property="CornerRadius" Value="12,12,4,12"/>
+	</Style>
 
-    <Style Selector="TextBlock.wxAvatarText">
-        <Setter Property="FontSize" Value="15"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="Foreground" Value="#FFFFFF"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-    </Style>
-
-    <Style Selector="TextBlock.wxConversationName">
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-    </Style>
-
-    <Style Selector="TextBlock.wxConversationMeta">
-        <Setter Property="FontSize" Value="11"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextSubtleBrush}"/>
-    </Style>
-
-    <Style Selector="Button.wxMemberAction">
-        <Setter Property="Background" Value="{DynamicResource OT.CardBgBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.CardBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="CornerRadius" Value="18"/>
-        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-    </Style>
-
-    <Style Selector="Button.wxMemberAction:pointerover">
-        <Setter Property="Background" Value="{DynamicResource OT.CardHoverBgBrush}"/>
-    </Style>
-
-    <Style Selector="Border.wxSelfBubble">
-        <Setter Property="Background" Value="{DynamicResource OT.SelfBubbleBgBrush}"/>
-        <Setter Property="CornerRadius" Value="12,12,4,12"/>
-    </Style>
-
-    <Style Selector="Border.wxOtherBubble">
-        <Setter Property="Background" Value="{DynamicResource OT.OtherBubbleBgBrush}"/>
-        <Setter Property="CornerRadius" Value="12,12,12,4"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource OT.OtherBubbleBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-    </Style>
+	<Style Selector="Border.wxOtherBubble">
+		<Setter Property="Background" Value="{DynamicResource OT.OtherBubbleBgBrush}"/>
+		<Setter Property="CornerRadius" Value="12,12,12,4"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource OT.OtherBubbleBorderBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+	</Style>
 </Styles>

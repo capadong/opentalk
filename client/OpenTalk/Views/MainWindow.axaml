@@ -1,143 +1,150 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:OpenTalk.ViewModels"
-        xmlns:components="using:OpenTalk.Views.Components"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        x:Name="RootWindow"
-        x:Class="OpenTalk.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Width="1360"
-        Height="820"
-        MinWidth="1080"
-        MinHeight="720"
-        Background="{DynamicResource OT.WindowBgBrush}"
-        Foreground="{DynamicResource OT.TextBrush}"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="OpenTalk">
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="using:OpenTalk.ViewModels"
+		xmlns:components="using:OpenTalk.Views.Components"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d"
+		x:Name="RootWindow"
+		x:Class="OpenTalk.Views.MainWindow"
+		x:DataType="vm:MainWindowViewModel"
+		Width="1360"
+		Height="820"
+		MinWidth="1080"
+		MinHeight="720"
+		Background="{DynamicResource OT.WindowBgBrush}"
+		Foreground="{DynamicResource OT.TextBrush}"
+		Icon="/Assets/avalonia-logo.ico"
+		Title="OpenTalk">
 
-    <Window.Styles>
-        <StyleInclude Source="avares://OpenTalk/Styles/MainWindowStyles.axaml"/>
-    </Window.Styles>
+	<Window.Styles>
+		<StyleInclude Source="avares://OpenTalk/Styles/MainWindowStyles.axaml"/>
+	</Window.Styles>
 
-    <Grid ColumnDefinitions="66,320,*">
-        <Border Grid.Column="0" Classes="wxNavRail" Padding="10,16">
-            <DockPanel LastChildFill="False">
-                <StackPanel DockPanel.Dock="Top" Spacing="8" HorizontalAlignment="Center">
-                    <Border Classes="wxAvatarCircle" Width="40" Height="40">
-                        <TextBlock Classes="wxAvatarText" FontSize="13" Text="OT"/>
-                    </Border>
-                    <Button Classes="wxRailButton" FontSize="18" Content="💬"/>
-                    <Button Classes="wxRailButton" FontSize="18" Content="👥"/>
-                    <Button Classes="wxRailButton" FontSize="18" Content="📁"/>
-                </StackPanel>
-                <StackPanel DockPanel.Dock="Bottom" Spacing="8" HorizontalAlignment="Center">
-                    <Button Classes="wxRailButton" FontSize="16" Click="OpenSettings_OnClick" Content="⚙"/>
-                    <Button Classes="wxRailButton" FontSize="16" Command="{Binding RefreshCommand}" Content="↻"/>
-                </StackPanel>
-            </DockPanel>
-        </Border>
+	<Grid ColumnDefinitions="66,320,*">
+		<Border Grid.Column="0" Classes="wxNavRail" Padding="10,16">
+			<DockPanel LastChildFill="False">
+				<StackPanel DockPanel.Dock="Top" Spacing="8" HorizontalAlignment="Center">
+					<Border Classes="wxAvatarCircle" Width="40" Height="40">
+						<TextBlock Classes="wxAvatarText" FontSize="13" Text="OT"/>
+					</Border>
+					<Button Classes="wxRailButton" FontSize="18" Content="💬"/>
+					<Button Classes="wxRailButton" FontSize="18" Content="👥"/>
+					<Button Classes="wxRailButton" FontSize="18" Content="📁"/>
+				</StackPanel>
+				<StackPanel DockPanel.Dock="Bottom" Spacing="8" HorizontalAlignment="Center">
+					<Button Classes="wxRailButton" FontSize="16" Click="OpenSettings_OnClick" Content="⚙"/>
+					<Button Classes="wxRailButton" FontSize="16" Command="{Binding RefreshCommand}" Content="↻"/>
+				</StackPanel>
+			</DockPanel>
+		</Border>
 
-        <Border Grid.Column="1" Classes="wxConversationPane" Padding="14,14,12,10">
-            <Grid RowDefinitions="Auto,Auto,*,Auto">
-                <StackPanel Spacing="2">
-                    <TextBlock Classes="wxPaneTitle" Text="OpenTalk"/>
-                    <TextBlock Classes="wxMutedText" FontSize="12" Text="OpenTalk 会话列表"/>
-                </StackPanel>
+		<Border Grid.Column="1" Classes="wxConversationPane" Padding="14,14,12,10">
+			<Grid RowDefinitions="Auto,Auto,*,Auto">
+				<StackPanel Spacing="2">
+					<TextBlock Classes="wxPaneTitle" Text="OpenTalk"/>
+					<TextBlock Classes="wxMutedText" FontSize="12" Text="OpenTalk 会话列表"/>
+				</StackPanel>
 
-                <Grid Grid.Row="1" Margin="0,12,0,10" ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                    <TextBox Classes="wxSearchBox" Watermark="搜索" IsReadOnly="True"/>
-                    <Button Grid.Column="1" Classes="wxIconAction" Command="{Binding RefreshCommand}" Content="⟳" />
-                </Grid>
+				<Grid Grid.Row="1" Margin="0,12,0,10" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+					<TextBox Classes="wxSearchBox" Watermark="搜索" IsReadOnly="True"/>
+					<Button Grid.Column="1" Classes="wxIconAction" Command="{Binding RefreshCommand}" Content="⟳" />
+				</Grid>
 
-                <ListBox Grid.Row="2" Classes="wxConversationList" ItemsSource="{Binding Conversations}" SelectedItem="{Binding SelectedConversation}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:MainWindowViewModel+ConversationListEntry">
-                            <components:ConversationListItem/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+				<ListBox Grid.Row="2" Classes="wxConversationList" ItemsSource="{Binding Conversations}" SelectedItem="{Binding SelectedConversation}">
+					<ListBox.ItemTemplate>
+						<DataTemplate x:DataType="vm:MainWindowViewModel+ConversationListEntry">
+							<components:ConversationListItem/>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
 
-                <Border Grid.Row="3"
-                        Margin="0,10,0,0"
-                        Padding="10"
-                        Classes="wxConversationCard">
-                    <StackPanel Spacing="2">
-                        <TextBlock FontSize="12" Classes="wxMutedText" Text="{Binding ConnectionState}"/>
-                        <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding StatusText}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
+				<Border Grid.Row="3"
+						Margin="0,10,0,0"
+						Padding="10"
+						Classes="wxConversationCard">
+					<StackPanel Spacing="2">
+						<TextBlock FontSize="12" Classes="wxMutedText" Text="{Binding ConnectionState}"/>
+						<TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding StatusText}" TextWrapping="Wrap"/>
+					</StackPanel>
+				</Border>
+			</Grid>
+		</Border>
 
-        <Border Grid.Column="2" Classes="wxChatPane">
-            <Grid RowDefinitions="Auto,*,Auto">
-                <Border Grid.Row="0" Classes="wxHeader" Padding="18,12">
-                    <Grid RowDefinitions="Auto">
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                            <StackPanel Spacing="2">
-                                <TextBlock FontSize="22" FontWeight="SemiBold" Text="{Binding CurrentTitle}"/>
-                                <TextBlock Classes="wxMutedText" Text="{Binding CurrentSubtitle}"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                <Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.CardBorderBrush}" BorderThickness="1" CornerRadius="16" Padding="10,4">
-                                    <TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" Text="{Binding CurrentUserLabel}"/>
-                                </Border>
-                            </StackPanel>
-                        </Grid>
-                    </Grid>
-                </Border>
+		<Border Grid.Column="2" Classes="wxChatPane">
+			<Grid RowDefinitions="Auto,*,Auto">
+				<Border Grid.Row="0" Classes="wxHeader" Padding="18,12">
+					<Grid RowDefinitions="Auto">
+						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+							<StackPanel Spacing="2">
+								<TextBlock FontSize="22" FontWeight="SemiBold" Text="{Binding CurrentTitle}"/>
+								<TextBlock Classes="wxMutedText" Text="{Binding CurrentSubtitle}"/>
+							</StackPanel>
+							<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+								<Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.CardBorderBrush}" BorderThickness="1" CornerRadius="16" Padding="10,4">
+									<TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" Text="{Binding CurrentUserLabel}"/>
+								</Border>
+							</StackPanel>
+						</Grid>
+					</Grid>
+				</Border>
 
-                <ListBox Grid.Row="1"
-                         Name="ChatMessagesList"
-                         Classes="wxChatMessageList"
-                         Padding="18,14,12,14"
-                         ItemsSource="{Binding Messages}"
-                         Loaded="ChatMessagesList_OnLoaded"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel VerticalAlignment="Top"/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ChatMessageItemViewModel">
-                            <components:ChatMessageBubble/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+				<ListBox Grid.Row="1"
+						 Name="ChatMessagesList"
+						 Classes="wxChatMessageList"
+						 Padding="18,14,12,14"
+						 ItemsSource="{Binding Messages}"
+						 Loaded="ChatMessagesList_OnLoaded"
+						 SelectionMode="Single"
+						 SelectedItem="{x:Null}"
+						 Background="Transparent"
+						 BorderThickness="0"
+						 ScrollViewer.VerticalScrollBarVisibility="Auto"
+						 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
-                <Border Grid.Row="2" Classes="wxInputPane" Padding="14,10">
-                    <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button Classes="wxIconAction" Click="PickFile_OnClick" Content="+"/>
-                            <Button Classes="wxIconAction" Content="😊"/>
-                            <TextBlock VerticalAlignment="Center" Classes="wxSubtleText" FontSize="12" Text="{Binding InputHint}"/>
-                        </StackPanel>
-                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                            <TextBox Name="MessageInput"
-                                     Grid.Column="0"
-                                     Classes="wxComposer"
-                                     KeyDown="MessageInput_OnKeyDown"
-                                     Text="{Binding MessageText, Mode=TwoWay}"
-                                     Watermark="输入消息"
-                                     AcceptsReturn="True"
-                                     MinHeight="90"
-                                     TextWrapping="Wrap"/>
-                            <Button Grid.Column="1"
-                                    Classes="wxPrimaryAction"
-                                    Command="{Binding SendCommand}"
-                                    IsEnabled="{Binding CanSend}"
-                                    MinWidth="96"
-                                    VerticalAlignment="Bottom">
-                                发送
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Border>
-            </Grid>
-        </Border>
-    </Grid>
+					<!-- ✅ 关键：不要用 StackPanel -->
+					<ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel/>
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
+
+					<ListBox.ItemTemplate>
+						<DataTemplate x:DataType="vm:ChatMessageItemViewModel">
+							<components:ChatMessageBubble/>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+
+				<Border Grid.Row="2" Classes="wxInputPane" Padding="14,10">
+					<Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+						<StackPanel Orientation="Horizontal" Spacing="8">
+							<Button Classes="wxIconAction" Click="PickFile_OnClick" Content="+"/>
+							<Button Classes="wxIconAction" Content="😊"/>
+							<TextBlock VerticalAlignment="Center" Classes="wxSubtleText" FontSize="12" Text="{Binding InputHint}"/>
+						</StackPanel>
+						<Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+							<TextBox Name="MessageInput"
+									 Grid.Column="0"
+									 Classes="wxComposer"
+									 KeyDown="MessageInput_OnKeyDown"
+									 Text="{Binding MessageText, Mode=TwoWay}"
+									 Watermark="输入消息"
+									 AcceptsReturn="True"
+									 MinHeight="90"
+									 TextWrapping="Wrap"/>
+							<Button Grid.Column="1"
+									Classes="wxPrimaryAction"
+									Command="{Binding SendCommand}"
+									IsEnabled="{Binding CanSend}"
+									MinWidth="96"
+									VerticalAlignment="Bottom">
+								发送
+							</Button>
+						</Grid>
+					</Grid>
+				</Border>
+			</Grid>
+		</Border>
+	</Grid>
 </Window>
