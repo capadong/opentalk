@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:model="using:OpenTalk.Models"
+             x:Class="OpenTalk.Views.Components.ConversationListItem"
+             x:DataType="model:ChatGroup">
+    <Border Classes="wxConversationCard" Padding="10,8">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+            <Border Classes="wxAvatarCircle">
+                <TextBlock Classes="wxAvatarText" Text="群"/>
+            </Border>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Classes="wxConversationName" Text="{Binding Name}"/>
+                <TextBlock Classes="wxConversationMeta" Text="{Binding Id, StringFormat='群聊 #{0}'}"/>
+            </StackPanel>
+            <TextBlock Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Classes="wxConversationMeta"
+                       Text="{Binding CreatedAt, StringFormat='{}{0:MM/dd}'}"/>
+        </Grid>
+    </Border>
+</UserControl>

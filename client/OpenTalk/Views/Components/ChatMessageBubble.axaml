@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:OpenTalk.ViewModels"
+             x:Class="OpenTalk.Views.Components.ChatMessageBubble"
+             x:DataType="vm:ChatMessageItemViewModel">
+    <Grid Margin="0,0,0,12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" HorizontalAlignment="Left" MaxWidth="620" Spacing="5" IsVisible="{Binding IsOther}">
+            <TextBlock FontSize="12" Classes="wxMutedText" Text="{Binding SenderName}"/>
+            <Border Classes="wxOtherBubble" Padding="12,8">
+                <StackPanel Spacing="8">
+                    <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
+
+                    <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
+                        <StackPanel Spacing="6">
+                            <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
+                            <TextBlock FontSize="11" Classes="wxMutedText" Text="{Binding Content}"/>
+                            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
+                        <StackPanel Spacing="4">
+                            <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
+                            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding TimeText}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" HorizontalAlignment="Right" MaxWidth="620" Spacing="5" IsVisible="{Binding IsSelf}">
+            <TextBlock FontSize="12" HorizontalAlignment="Right" Text="{Binding SenderName}" Foreground="{DynamicResource OT.AccentTextBrush}"/>
+            <Border Classes="wxSelfBubble" Padding="12,8">
+                <StackPanel Spacing="8">
+                    <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
+
+                    <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
+                        <StackPanel Spacing="6">
+                            <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
+                            <TextBlock FontSize="11" Foreground="#EAFCE8" Text="{Binding Content}"/>
+                            <TextBlock FontSize="11" Foreground="#D6F8D2" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="8">
+                        <StackPanel Spacing="4">
+                            <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
+                            <TextBlock FontSize="11" Foreground="#D6F8D2" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <TextBlock FontSize="11" Classes="wxSubtleText" HorizontalAlignment="Right" Text="{Binding TimeText}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

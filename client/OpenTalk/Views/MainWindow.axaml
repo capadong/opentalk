@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:OpenTalk.ViewModels"
         xmlns:model="using:OpenTalk.Models"
+        xmlns:components="using:OpenTalk.Views.Components"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -18,240 +19,144 @@
         Title="OpenTalk">
 
     <Window.Styles>
-        <Style Selector="TextBlock.heading">
-            <Setter Property="FontSize" Value="22"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-        <Style Selector="Button.panelAction">
-            <Setter Property="Background" Value="{DynamicResource OT.ButtonBgBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource OT.ButtonBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="Padding" Value="14,8"/>
-            <Setter Property="CornerRadius" Value="12"/>
-        </Style>
-        <Style Selector="Button.memberAction">
-            <Setter Property="Background" Value="{DynamicResource OT.CardBgBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource OT.CardBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        </Style>
-        <Style Selector="Button.memberAction:pointerover">
-            <Setter Property="Background" Value="{DynamicResource OT.CardHoverBgBrush}"/>
-        </Style>
-        <Style Selector="Button.ghostAction">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource OT.GhostBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="{DynamicResource OT.GhostTextBrush}"/>
-            <Setter Property="Padding" Value="12,8"/>
-            <Setter Property="CornerRadius" Value="12"/>
-        </Style>
-        <Style Selector="Border.selfBubble">
-            <Setter Property="Background" Value="{DynamicResource OT.SelfBubbleBgBrush}"/>
-            <Setter Property="CornerRadius" Value="18,18,6,18"/>
-        </Style>
-        <Style Selector="Border.otherBubble">
-            <Setter Property="Background" Value="{DynamicResource OT.OtherBubbleBgBrush}"/>
-            <Setter Property="CornerRadius" Value="18,18,18,6"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource OT.OtherBubbleBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
-        <Style Selector="TextBox.chatInput">
-            <Setter Property="Background" Value="{DynamicResource OT.InputBgBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Foreground" Value="{DynamicResource OT.TextBrush}"/>
-            <Setter Property="CaretBrush" Value="{DynamicResource OT.AccentTextBrush}"/>
-            <Setter Property="SelectionBrush" Value="{DynamicResource OT.SelectionBrush}"/>
-            <Setter Property="SelectionForegroundBrush" Value="#FFFFFF"/>
-            <Setter Property="Padding" Value="14,12"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
-        <Style Selector="TextBox.chatInput:pointerover">
-            <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderHoverBrush}"/>
-        </Style>
-        <Style Selector="TextBox.chatInput:focus">
-            <Setter Property="BorderBrush" Value="{DynamicResource OT.InputBorderFocusBrush}"/>
-        </Style>
+        <StyleInclude Source="avares://OpenTalk/Styles/MainWindowStyles.axaml"/>
     </Window.Styles>
 
-    <Grid ColumnDefinitions="280,*,250" RowDefinitions="Auto,*,Auto">
-        <Border Grid.RowSpan="3" Background="{DynamicResource OT.SidebarBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="0,0,1,0" Padding="18">
-            <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Top" Spacing="10">
-                    <TextBlock Classes="heading" Text="OpenTalk"/>
-                    <TextBlock Foreground="{DynamicResource OT.TextMutedBrush}" Text="Avalonia Client · 群聊 / 私聊"/>
-                    <Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.BorderStrongBrush}" BorderThickness="1" CornerRadius="14" Padding="12">
-                        <StackPanel Spacing="4">
-                            <TextBlock FontSize="12" Foreground="{DynamicResource OT.TextMutedBrush}" Text="连接状态"/>
-                            <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding ConnectionState}"/>
-                            <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding StatusText}" TextWrapping="Wrap"/>
-                        </StackPanel>
+    <Grid ColumnDefinitions="66,320,*">
+        <Border Grid.Column="0" Classes="wxNavRail" Padding="10,16">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Spacing="8" HorizontalAlignment="Center">
+                    <Border Classes="wxAvatarCircle" Width="40" Height="40">
+                        <TextBlock Classes="wxAvatarText" FontSize="13" Text="OT"/>
                     </Border>
-                    <Button Classes="panelAction" Command="{Binding RefreshCommand}">刷新群组</Button>
+                    <Button Classes="wxRailButton" FontSize="18" Content="💬"/>
+                    <Button Classes="wxRailButton" FontSize="18" Content="👥"/>
+                    <Button Classes="wxRailButton" FontSize="18" Content="📁"/>
                 </StackPanel>
-
-                <StackPanel Margin="0,18,0,0" Spacing="10">
-                    <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource OT.TextMutedBrush}" Text="我的群组"/>
-                    <ListBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" Background="Transparent" BorderThickness="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate x:DataType="model:ChatGroup">
-                                <Border Margin="0,0,0,8" Padding="14,12" CornerRadius="14" Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.CardBorderBrush}" BorderThickness="1">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock FontWeight="SemiBold" Text="{Binding Name}"/>
-                                        <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding Id, StringFormat='ID: {0}'}"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                <StackPanel DockPanel.Dock="Bottom" Spacing="8" HorizontalAlignment="Center">
+                    <Button Classes="wxRailButton" FontSize="16" Click="OpenSettings_OnClick" Content="⚙"/>
+                    <Button Classes="wxRailButton" FontSize="16" Command="{Binding RefreshCommand}" Content="↻"/>
                 </StackPanel>
             </DockPanel>
         </Border>
 
-        <Border Grid.Column="1" Background="{DynamicResource OT.TopbarBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="0,0,0,1" Padding="22,18">
-            <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Spacing="4">
-                    <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding CurrentTitle}"/>
-                    <TextBlock Foreground="{DynamicResource OT.TextMutedBrush}" Text="{Binding CurrentSubtitle}"/>
+        <Border Grid.Column="1" Classes="wxConversationPane" Padding="14,14,12,10">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+                <StackPanel Spacing="2">
+                    <TextBlock Classes="wxPaneTitle" Text="OpenTalk"/>
+                    <TextBlock Classes="wxMutedText" FontSize="12" Text="OpenTalk 会话列表"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Spacing="8" HorizontalAlignment="Right">
-                    <Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.BorderStrongBrush}" BorderThickness="1" CornerRadius="999" Padding="12,6" HorizontalAlignment="Right">
-                        <TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" Text="{Binding CurrentUserLabel}"/>
-                    </Border>
-                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                        <Button Classes="ghostAction" Click="OpenSettings_OnClick">设置</Button>
-                        <Button Classes="panelAction" Command="{Binding OpenGroupChatCommand}" IsVisible="{Binding IsDirectMode}">返回群聊</Button>
+
+                <Grid Grid.Row="1" Margin="0,12,0,10" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <TextBox Classes="wxSearchBox" Watermark="搜索" IsReadOnly="True"/>
+                    <Button Grid.Column="1" Classes="wxIconAction" Command="{Binding RefreshCommand}" Content="⟳"/>
+                </Grid>
+
+                <ListBox Grid.Row="2" Classes="wxConversationList" ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="model:ChatGroup">
+                            <components:ConversationListItem/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Border Grid.Row="3"
+                        Margin="0,10,0,0"
+                        Padding="10"
+                        Classes="wxConversationCard">
+                    <StackPanel Spacing="2">
+                        <TextBlock FontSize="12" Classes="wxMutedText" Text="{Binding ConnectionState}"/>
+                        <TextBlock FontSize="11" Classes="wxSubtleText" Text="{Binding StatusText}" TextWrapping="Wrap"/>
                     </StackPanel>
-                </StackPanel>
+                </Border>
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource OT.ChatAreaBgBrush}">
-            <ScrollViewer Name="ChatScroll"
-                          Margin="0"
-                          Padding="22,18"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          ScrollChanged="ChatScroll_OnScrollChanged">
-                <ItemsControl ItemsSource="{Binding Messages}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:ChatMessageItemViewModel">
-                            <Grid Margin="0,0,0,14">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0" HorizontalAlignment="Left" MaxWidth="520" Spacing="5" IsVisible="{Binding IsOther}">
-                                    <TextBlock FontSize="12" Foreground="{DynamicResource OT.TextMutedBrush}" Text="{Binding SenderName}"/>
-                                    <Border Classes="otherBubble" Padding="14,10">
-                                        <StackPanel Spacing="8">
-                                            <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
-
-                                            <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
-                                                <StackPanel Spacing="8">
-                                                    <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
-                                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextMutedBrush}" Text="{Binding Content}"/>
-                                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                            </Border>
-
-                                            <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
-                                                <StackPanel Spacing="6">
-                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
-                                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                            </Border>
-                                        </StackPanel>
-                                    </Border>
-                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding TimeText}"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" MaxWidth="520" Spacing="5" IsVisible="{Binding IsSelf}">
-                                    <TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" HorizontalAlignment="Right" Text="{Binding SenderName}"/>
-                                    <Border Classes="selfBubble" Padding="14,10">
-                                        <StackPanel Spacing="8">
-                                            <TextBlock IsVisible="{Binding IsText}" TextWrapping="Wrap" Text="{Binding Content}"/>
-
-                                            <Border IsVisible="{Binding IsImage}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
-                                                <StackPanel Spacing="8">
-                                                    <Image Source="{Binding ImageBitmap}" Stretch="Uniform" MaxHeight="260"/>
-                                                    <TextBlock FontSize="11" Foreground="#D6E4FF" Text="{Binding Content}"/>
-                                                    <TextBlock FontSize="11" Foreground="#C7D2FE" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                            </Border>
-
-                                            <Border IsVisible="{Binding IsFile}" Background="{DynamicResource OT.InputBgBrush}" BorderBrush="{DynamicResource OT.InputBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10">
-                                                <StackPanel Spacing="6">
-                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Content}"/>
-                                                    <TextBlock FontSize="11" Foreground="#C7D2FE" Text="{Binding FileUrl}" TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                            </Border>
-                                        </StackPanel>
-                                    </Border>
-                                    <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" HorizontalAlignment="Right" Text="{Binding TimeText}"/>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Border>
-
-        <Border Grid.Row="2" Grid.Column="1" Background="{DynamicResource OT.InputBarBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="0,1,0,0" Padding="18">
-            <StackPanel Spacing="12">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Right" FontSize="12" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding InputHint}" HorizontalAlignment="Right"/>
-                </DockPanel>
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                    <TextBox Name="MessageInput"
-                             Classes="chatInput"
-                             KeyDown="MessageInput_OnKeyDown"
-                             Grid.Column="0"
-                             Text="{Binding MessageText, Mode=TwoWay}"
-                             Watermark="输入消息..."
-                             AcceptsReturn="True"
-                             MinHeight="84"
-                             TextWrapping="Wrap"/>
-                    <Button Grid.Column="1"
-                            Classes="panelAction"
-                            Command="{Binding SendCommand}"
-                            IsEnabled="{Binding CanSend}"
-                            MinWidth="100"
-                            VerticalAlignment="Bottom">
-                        发送
-                    </Button>
-                </Grid>
-            </StackPanel>
-        </Border>
-
-        <Border Grid.RowSpan="3" Grid.Column="2" Background="{DynamicResource OT.RightPanelBgBrush}" BorderBrush="{DynamicResource OT.BorderBrush}" BorderThickness="1,0,0,0" Padding="18">
-            <StackPanel Spacing="12">
-                <TextBlock Classes="heading" Text="成员"/>
-                <TextBlock Foreground="{DynamicResource OT.TextMutedBrush}" Text="点击成员可打开私聊"/>
-                <ItemsControl ItemsSource="{Binding Members}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="model:GroupMember">
-                            <Button Classes="memberAction"
-                                    Command="{Binding #RootWindow.DataContext.OpenDirectChatCommand}"
-                                    CommandParameter="{Binding}">
-                                <Border Padding="12" Background="Transparent">
-                                    <StackPanel Spacing="3">
-                                        <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}"/>
-                                        <TextBlock FontSize="11" Foreground="{DynamicResource OT.TextSubtleBrush}" Text="{Binding Username, StringFormat='@{0}'}"/>
-                                    </StackPanel>
+        <Border Grid.Column="2" Classes="wxChatPane">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <Border Grid.Row="0" Classes="wxHeader" Padding="18,12">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <StackPanel Spacing="2">
+                                <TextBlock FontSize="22" FontWeight="SemiBold" Text="{Binding CurrentTitle}"/>
+                                <TextBlock Classes="wxMutedText" Text="{Binding CurrentSubtitle}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Border Background="{DynamicResource OT.CardBgBrush}" BorderBrush="{DynamicResource OT.CardBorderBrush}" BorderThickness="1" CornerRadius="16" Padding="10,4">
+                                    <TextBlock FontSize="12" Foreground="{DynamicResource OT.AccentTextBrush}" Text="{Binding CurrentUserLabel}"/>
                                 </Border>
+                                <Button Classes="wxGhostAction" Click="OpenSettings_OnClick">设置</Button>
+                                <Button Classes="wxPrimaryAction" Command="{Binding OpenGroupChatCommand}" IsVisible="{Binding IsDirectMode}">返回群聊</Button>
+                            </StackPanel>
+                        </Grid>
+                        <ScrollViewer Grid.Row="1"
+                                      IsVisible="{Binding IsGroupMode}"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding Members}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="model:GroupMember">
+                                        <Button Classes="wxMemberAction"
+                                                Command="{Binding #RootWindow.DataContext.OpenDirectChatCommand}"
+                                                CommandParameter="{Binding}">
+                                            <components:MemberChip/>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <ScrollViewer Grid.Row="1"
+                              Name="ChatScroll"
+                              Padding="18,14"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              ScrollChanged="ChatScroll_OnScrollChanged">
+                    <ItemsControl ItemsSource="{Binding Messages}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ChatMessageItemViewModel">
+                                <components:ChatMessageBubble/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Border Grid.Row="2" Classes="wxInputPane" Padding="14,10">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Classes="wxIconAction" Click="PickFile_OnClick" Content="+"/>
+                            <Button Classes="wxIconAction" Content="😊"/>
+                            <TextBlock VerticalAlignment="Center" Classes="wxSubtleText" FontSize="12" Text="{Binding InputHint}"/>
+                        </StackPanel>
+                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <TextBox Name="MessageInput"
+                                     Grid.Column="0"
+                                     Classes="wxComposer"
+                                     KeyDown="MessageInput_OnKeyDown"
+                                     Text="{Binding MessageText, Mode=TwoWay}"
+                                     Watermark="输入消息"
+                                     AcceptsReturn="True"
+                                     MinHeight="90"
+                                     TextWrapping="Wrap"/>
+                            <Button Grid.Column="1"
+                                    Classes="wxPrimaryAction"
+                                    Command="{Binding SendCommand}"
+                                    IsEnabled="{Binding CanSend}"
+                                    MinWidth="96"
+                                    VerticalAlignment="Bottom">
+                                发送
                             </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
         </Border>
     </Grid>
 </Window>

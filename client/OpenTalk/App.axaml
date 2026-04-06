@@ -15,89 +15,97 @@
                 <!-- Dark theme (hand-tuned) -->
                 <ResourceDictionary x:Key="Dark">
                     <!-- Surfaces -->
-                    <Color x:Key="OT.WindowBgColor">#0B1020</Color>
-                    <Color x:Key="OT.SidebarBgColor">#0F172A</Color>
-                    <Color x:Key="OT.RightPanelBgColor">#0E1628</Color>
-                    <Color x:Key="OT.TopbarBgColor">#0B1020</Color>
-                    <Color x:Key="OT.ChatAreaBgColor">#0A0F1D</Color>
-                    <Color x:Key="OT.InputBarBgColor">#0D1426</Color>
+                    <Color x:Key="OT.WindowBgColor">#1D1F24</Color>
+                    <Color x:Key="OT.SidebarBgColor">#202329</Color>
+                    <Color x:Key="OT.RightPanelBgColor">#FFFFFF</Color>
+                    <Color x:Key="OT.ListPaneBgColor">#2A2E36</Color>
+                    <Color x:Key="OT.TopbarBgColor">#F5F5F5</Color>
+                    <Color x:Key="OT.ChatAreaBgColor">#EDEDED</Color>
+                    <Color x:Key="OT.InputBarBgColor">#F7F7F7</Color>
 
                     <!-- Borders -->
-                    <Color x:Key="OT.BorderColor">#1E293B</Color>
-                    <Color x:Key="OT.BorderStrongColor">#253052</Color>
+                    <Color x:Key="OT.BorderColor">#D9D9D9</Color>
+                    <Color x:Key="OT.BorderStrongColor">#BFC3C9</Color>
 
                     <!-- Text -->
-                    <Color x:Key="OT.TextColor">#E5E7EB</Color>
-                    <Color x:Key="OT.TextMutedColor">#94A3B8</Color>
-                    <Color x:Key="OT.TextSubtleColor">#7C8DB5</Color>
-                    <Color x:Key="OT.AccentTextColor">#BFDBFE</Color>
+                    <Color x:Key="OT.TextColor">#1F1F1F</Color>
+                    <Color x:Key="OT.TextMutedColor">#70757F</Color>
+                    <Color x:Key="OT.TextSubtleColor">#8A8F99</Color>
+                    <Color x:Key="OT.AccentTextColor">#07C160</Color>
 
                     <!-- Buttons -->
-                    <Color x:Key="OT.ButtonBgColor">#18213A</Color>
-                    <Color x:Key="OT.ButtonBorderColor">#253052</Color>
-                    <Color x:Key="OT.GhostBorderColor">#31405F</Color>
-                    <Color x:Key="OT.GhostTextColor">#D6E4FF</Color>
+                    <Color x:Key="OT.ButtonBgColor">#07C160</Color>
+                    <Color x:Key="OT.ButtonBorderColor">#07C160</Color>
+                    <Color x:Key="OT.GhostBorderColor">#C6CAD1</Color>
+                    <Color x:Key="OT.GhostTextColor">#4C525C</Color>
 
                     <!-- Cards / items -->
-                    <Color x:Key="OT.CardBgColor">#121A2E</Color>
-                    <Color x:Key="OT.CardBorderColor">#22304D</Color>
-                    <Color x:Key="OT.CardHoverBgColor">#1A2540</Color>
+                    <Color x:Key="OT.CardBgColor">#323741</Color>
+                    <Color x:Key="OT.CardBorderColor">#323741</Color>
+                    <Color x:Key="OT.CardHoverBgColor">#3C424D</Color>
+                    <Color x:Key="OT.CardSelectedBgColor">#3C424D</Color>
+                    <Color x:Key="OT.CardSelectedBorderColor">#07C160</Color>
 
                     <!-- Bubbles -->
-                    <Color x:Key="OT.SelfBubbleBgColor">#2D6DF6</Color>
-                    <Color x:Key="OT.OtherBubbleBgColor">#141C31</Color>
-                    <Color x:Key="OT.OtherBubbleBorderColor">#24314F</Color>
+                    <Color x:Key="OT.SelfBubbleBgColor">#95EC69</Color>
+                    <Color x:Key="OT.OtherBubbleBgColor">#FFFFFF</Color>
+                    <Color x:Key="OT.OtherBubbleBorderColor">#DFDFDF</Color>
 
                     <!-- Inputs -->
-                    <Color x:Key="OT.InputBgColor">#0B1222</Color>
-                    <Color x:Key="OT.InputBorderColor">#273554</Color>
-                    <Color x:Key="OT.InputBorderHoverColor">#36507A</Color>
-                    <Color x:Key="OT.InputBorderFocusColor">#4F7DFF</Color>
-                    <Color x:Key="OT.SelectionBgColor">#2D6DF6</Color>
+                    <Color x:Key="OT.InputBgColor">#FFFFFF</Color>
+                    <Color x:Key="OT.InputBorderColor">#D6D6D6</Color>
+                    <Color x:Key="OT.InputBorderHoverColor">#C9CDD4</Color>
+                    <Color x:Key="OT.InputBorderFocusColor">#07C160</Color>
+                    <Color x:Key="OT.SelectionBgColor">#07C160</Color>
+                    <Color x:Key="OT.AvatarBgColor">#07C160</Color>
                 </ResourceDictionary>
 
                 <!-- Light theme (hand-tuned, new) -->
                 <ResourceDictionary x:Key="Light">
                     <!-- Surfaces: warm paper + cool ink -->
-                    <Color x:Key="OT.WindowBgColor">#F6F5F1</Color>
-                    <Color x:Key="OT.SidebarBgColor">#F0EFEA</Color>
-                    <Color x:Key="OT.RightPanelBgColor">#F0F2F6</Color>
-                    <Color x:Key="OT.TopbarBgColor">#F6F5F1</Color>
-                    <Color x:Key="OT.ChatAreaBgColor">#FFFFFF</Color>
-                    <Color x:Key="OT.InputBarBgColor">#F3F5F8</Color>
+                    <Color x:Key="OT.WindowBgColor">#FFFFFF</Color>
+                    <Color x:Key="OT.SidebarBgColor">#2E3238</Color>
+                    <Color x:Key="OT.RightPanelBgColor">#FFFFFF</Color>
+                    <Color x:Key="OT.ListPaneBgColor">#F5F5F5</Color>
+                    <Color x:Key="OT.TopbarBgColor">#F8F8F8</Color>
+                    <Color x:Key="OT.ChatAreaBgColor">#EDEDED</Color>
+                    <Color x:Key="OT.InputBarBgColor">#F7F7F7</Color>
 
                     <!-- Borders: soft graphite -->
-                    <Color x:Key="OT.BorderColor">#D6DAE2</Color>
-                    <Color x:Key="OT.BorderStrongColor">#C6CBD6</Color>
+                    <Color x:Key="OT.BorderColor">#D9D9D9</Color>
+                    <Color x:Key="OT.BorderStrongColor">#C8CCD3</Color>
 
                     <!-- Text: deep ink -->
-                    <Color x:Key="OT.TextColor">#111827</Color>
-                    <Color x:Key="OT.TextMutedColor">#5B6474</Color>
-                    <Color x:Key="OT.TextSubtleColor">#7B8597</Color>
-                    <Color x:Key="OT.AccentTextColor">#0B4DD8</Color>
+                    <Color x:Key="OT.TextColor">#1F1F1F</Color>
+                    <Color x:Key="OT.TextMutedColor">#70757F</Color>
+                    <Color x:Key="OT.TextSubtleColor">#8A8F99</Color>
+                    <Color x:Key="OT.AccentTextColor">#07C160</Color>
 
                     <!-- Buttons: ink on mist -->
-                    <Color x:Key="OT.ButtonBgColor">#111827</Color>
-                    <Color x:Key="OT.ButtonBorderColor">#111827</Color>
-                    <Color x:Key="OT.GhostBorderColor">#C6CBD6</Color>
-                    <Color x:Key="OT.GhostTextColor">#111827</Color>
+                    <Color x:Key="OT.ButtonBgColor">#07C160</Color>
+                    <Color x:Key="OT.ButtonBorderColor">#07C160</Color>
+                    <Color x:Key="OT.GhostBorderColor">#C8CCD3</Color>
+                    <Color x:Key="OT.GhostTextColor">#4C525C</Color>
 
                     <!-- Cards / items -->
                     <Color x:Key="OT.CardBgColor">#FFFFFF</Color>
-                    <Color x:Key="OT.CardBorderColor">#D6DAE2</Color>
-                    <Color x:Key="OT.CardHoverBgColor">#F2F6FF</Color>
+                    <Color x:Key="OT.CardBorderColor">#E4E6EA</Color>
+                    <Color x:Key="OT.CardHoverBgColor">#F1F3F5</Color>
+                    <Color x:Key="OT.CardSelectedBgColor">#ECF8F1</Color>
+                    <Color x:Key="OT.CardSelectedBorderColor">#07C160</Color>
 
                     <!-- Bubbles -->
-                    <Color x:Key="OT.SelfBubbleBgColor">#0B4DD8</Color>
-                    <Color x:Key="OT.OtherBubbleBgColor">#F3F4F6</Color>
-                    <Color x:Key="OT.OtherBubbleBorderColor">#E0E5EE</Color>
+                    <Color x:Key="OT.SelfBubbleBgColor">#95EC69</Color>
+                    <Color x:Key="OT.OtherBubbleBgColor">#FFFFFF</Color>
+                    <Color x:Key="OT.OtherBubbleBorderColor">#DFDFDF</Color>
 
                     <!-- Inputs -->
                     <Color x:Key="OT.InputBgColor">#FFFFFF</Color>
-                    <Color x:Key="OT.InputBorderColor">#D1D7E2</Color>
-                    <Color x:Key="OT.InputBorderHoverColor">#B9C3D6</Color>
-                    <Color x:Key="OT.InputBorderFocusColor">#0B4DD8</Color>
-                    <Color x:Key="OT.SelectionBgColor">#0B4DD8</Color>
+                    <Color x:Key="OT.InputBorderColor">#D6D6D6</Color>
+                    <Color x:Key="OT.InputBorderHoverColor">#C9CDD4</Color>
+                    <Color x:Key="OT.InputBorderFocusColor">#07C160</Color>
+                    <Color x:Key="OT.SelectionBgColor">#07C160</Color>
+                    <Color x:Key="OT.AvatarBgColor">#07C160</Color>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
@@ -105,6 +113,7 @@
             <SolidColorBrush x:Key="OT.WindowBgBrush" Color="{DynamicResource OT.WindowBgColor}"/>
             <SolidColorBrush x:Key="OT.SidebarBgBrush" Color="{DynamicResource OT.SidebarBgColor}"/>
             <SolidColorBrush x:Key="OT.RightPanelBgBrush" Color="{DynamicResource OT.RightPanelBgColor}"/>
+            <SolidColorBrush x:Key="OT.ListPaneBgBrush" Color="{DynamicResource OT.ListPaneBgColor}"/>
             <SolidColorBrush x:Key="OT.TopbarBgBrush" Color="{DynamicResource OT.TopbarBgColor}"/>
             <SolidColorBrush x:Key="OT.ChatAreaBgBrush" Color="{DynamicResource OT.ChatAreaBgColor}"/>
             <SolidColorBrush x:Key="OT.InputBarBgBrush" Color="{DynamicResource OT.InputBarBgColor}"/>
@@ -125,6 +134,8 @@
             <SolidColorBrush x:Key="OT.CardBgBrush" Color="{DynamicResource OT.CardBgColor}"/>
             <SolidColorBrush x:Key="OT.CardBorderBrush" Color="{DynamicResource OT.CardBorderColor}"/>
             <SolidColorBrush x:Key="OT.CardHoverBgBrush" Color="{DynamicResource OT.CardHoverBgColor}"/>
+            <SolidColorBrush x:Key="OT.CardSelectedBgBrush" Color="{DynamicResource OT.CardSelectedBgColor}"/>
+            <SolidColorBrush x:Key="OT.CardSelectedBorderBrush" Color="{DynamicResource OT.CardSelectedBorderColor}"/>
 
             <SolidColorBrush x:Key="OT.SelfBubbleBgBrush" Color="{DynamicResource OT.SelfBubbleBgColor}"/>
             <SolidColorBrush x:Key="OT.OtherBubbleBgBrush" Color="{DynamicResource OT.OtherBubbleBgColor}"/>
@@ -135,6 +146,7 @@
             <SolidColorBrush x:Key="OT.InputBorderHoverBrush" Color="{DynamicResource OT.InputBorderHoverColor}"/>
             <SolidColorBrush x:Key="OT.InputBorderFocusBrush" Color="{DynamicResource OT.InputBorderFocusColor}"/>
             <SolidColorBrush x:Key="OT.SelectionBrush" Color="{DynamicResource OT.SelectionBgColor}"/>
+            <SolidColorBrush x:Key="OT.AvatarBgBrush" Color="{DynamicResource OT.AvatarBgColor}"/>
         </ResourceDictionary>
     </Application.Resources>
   
